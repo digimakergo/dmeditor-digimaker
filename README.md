@@ -10,3 +10,23 @@ Digimaker CMF Widgets for dmeditor
 - Embed content
 - Carousel
 - Gallery
+
+
+**How to use**
+
+Install
+```
+npm install dmeditor-digimaker
+```
+
+Register widgets
+```typescript
+//App.tsx
+import { toolCarousel, toolEmbedContent, toolContentGallery, toolContentGrid } from "dmeditor-digimaker";
+
+
+registerTool(toolContentGrid);
+registerTool(toolEmbedContent);
+registerTool(toolCarousel);
+registerTool(toolContentGallery);
+```
