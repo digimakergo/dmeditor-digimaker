@@ -49,12 +49,10 @@ const EmbedContent = (props:ToolRenderProps) =>{
     setisChange(!isChange);
     let data = props.data;
       props.onChange({...data, content: idsArray});
-      console.log({...data, content: idsArray})
        
   }
 
   const getList = ()=>{
-    console.log("获取 数据 啦",ids)
     if( ids.length > 0 ){
       FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/get/'+ids.join(',')).then(data=>{
         let listArray:Array<any> = [];

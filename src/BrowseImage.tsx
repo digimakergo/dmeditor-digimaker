@@ -3,7 +3,7 @@
 import Browse from 'digimaker-ui/Browse';
 //@ts-ignore
 import util,{FetchWithAuth} from 'digimaker-ui/util'
-import { useEffect, useState,useRef } from "react";
+import React,{ useEffect, useState,useRef } from "react";
 import {IconButton,TextField, Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -17,7 +17,6 @@ export const BrowseImage = (props:DialogProps) =>{
     const [sourceType, setSourceType] = useState('select');
     const [inputUrl, setInputUrl] = useState('');
     const [currentList, setCurrentList] = useState({image:''});
-    console.log(sourceType)
     
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);

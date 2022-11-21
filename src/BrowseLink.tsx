@@ -1,7 +1,7 @@
 import Browse from 'digimaker-ui/Browse';
 //@ts-ignore
 import util,{FetchWithAuth} from 'digimaker-ui/util'
-import { useEffect, useState,useRef } from "react";
+import React,{ useEffect, useState,useRef } from "react";
 import {IconButton,TextField,Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
@@ -12,19 +12,12 @@ export interface DialogProps {
 }
 
 export const BrowseLink = (props:DialogProps) =>{
-  console.log("BrowseLink---props===>",props)
     const [adding, setAdding] = useState(props.adding?true:false);
     const [sourceType, setSourceType] = useState(props.defalutValue?props.defalutValue.source.sourceType:'select');
     const [inputUrl, setInputUrl] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='input'?props.defalutValue.url:'');
     const [currentList, setCurrentList] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='select'?props.defalutValue.source.sourceData:{id:'',content_type:'article'});
-console.log(sourceType)
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);
-      // if(sourceType=='input'){
-      //   setCurrentList({id:'',content_type:'article'})
-      // }else{
-      //   setInputUrl('')
-      // }
     };
     const onConfirmSelect= (list:any)=>{
       setCurrentList(list)
