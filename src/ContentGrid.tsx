@@ -19,7 +19,7 @@ export interface DialogTitleProps {
 }
 
 const ContentGrid = (props:ToolRenderProps) =>{
-    const [ids, setIds] = useState(props.data.content as any);
+    const [ids, setIds] = useState(props.data.data as any);
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
     const [list, setList] = useState([] as any);
@@ -89,7 +89,7 @@ const ContentGrid = (props:ToolRenderProps) =>{
       setAdding(false);
       setisChange(!isChange);
       let data = props.data;
-      props.onChange({...data, content: idsArray});
+      props.onChange({...data, data: idsArray});
     }
 
     const onConfirmDynamic = ()=>{
@@ -256,6 +256,6 @@ export const  toolContentGrid =   {
       category: "content",
       icon: <GridViewOutlined />,
     },
-initData: {type:'content_grid', content:[], settings:{contentType:'article', columns:3, space:5}},
+initData: {type:'content_grid', data:[], settings:{contentType:'article', columns:3, space:5}},
 view: (props:{data:Array<any>})=><ContentGrid data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <ContentGrid {...props} /> }

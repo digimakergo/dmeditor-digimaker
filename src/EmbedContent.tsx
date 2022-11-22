@@ -12,7 +12,7 @@ import { Button } from "@mui/material";
 
 
 const EmbedContent = (props:ToolRenderProps) =>{
-  const [ids, setIds] = useState(props.data.content as any);
+  const [ids, setIds] = useState(props.data.data as any);
   const [list, setList] = useState([] as any);
   const [columns, setColumns] = useState(1);
   const [adding, setAdding] = useState(props.adding);
@@ -48,7 +48,7 @@ const EmbedContent = (props:ToolRenderProps) =>{
     setAdding(false);
     setisChange(!isChange);
     let data = props.data;
-      props.onChange({...data, content: idsArray});
+      props.onChange({...data, data: idsArray});
        
   }
 
@@ -101,6 +101,6 @@ menu: {
   category: "content",
   icon: <SquareOutlined />,
 },
-initData: {type:'content_Embed', content:[], settings:{contentType:'article'}},
+initData: {type:'content_Embed', data:[], settings:{contentType:'article'}},
 view: (props:{data:Array<any>})=><EmbedContent data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <EmbedContent {...props} /> }

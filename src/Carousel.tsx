@@ -76,7 +76,7 @@ function BlockCarousel(props: ToolRenderProps) {
     return props.data.settings.interval ? 5000 : null;
   });
   const [list, setList] = useState<any[]>(() => {
-    return props.data.content;
+    return props.data.data;
   });
   useEffect(() => {
     if (list.length > 0) {
@@ -201,7 +201,7 @@ export const toolCarousel: ToolDefinition = {
   },
   initData: {
     type: "carousel",
-    content: [],
+    data: [],
     settings: {
       height: 300,
       indicators: true,
