@@ -28,7 +28,6 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
     let params:string = '';
    
     const fetchData = ()=>{
-      console.log("ccc")
       let url = '/content/get/'+params
       FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
       .then((data) => {
