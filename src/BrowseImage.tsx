@@ -9,6 +9,7 @@ import CloseIcon from '@mui/icons-material/Close';
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Util } from "dmeditor/utils/Util";
+import React from 'react';
 
 export interface DialogProps {
   adding?: boolean;
@@ -36,20 +37,17 @@ export const BrowseImage = (props:DialogProps) =>{
     const onConfirm = ()=>{
       if(sourceType=='input'){
         if(inputUrl==''){
-          let msg='Please enter the url before confirm'
-          Util.toaster?Util.toaster.error(msg):alert(msg)
+          Util.error('Please enter the url before confirm')
          return  false    
         }
         if (!isImageUrl(inputUrl)) {
-          let msg='URL is not an image'
-          Util.toaster?Util.toaster.error(msg):alert(msg)
+          Util.error('URL is not an image')
           return false  
         }
         props.onConfirm(inputUrl,'input')
       }else{
         if((currentList.image??'')==''){
-          let msg='Please select a image  before confirm'
-          Util.toaster?Util.toaster.error(msg):alert(msg)
+          Util.error('Please select a image  before confirm')
          return  false    
         }
         props.onConfirm(currentList,'select')
