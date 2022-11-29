@@ -5,9 +5,12 @@ import {FetchWithAuth} from 'digimaker-ui/util';
 import { Select,MenuItem,FormControl} from "@mui/material";
 
 export interface PrivatePropertyProps {
-  id:number, 
+  id:any, 
   contenttype?:string, 
-  ref:any
+  ref:any,
+  type?:any,
+  validation?:any
+  content:any
   // afterAction:any
 }
 
@@ -22,32 +25,58 @@ export interface CustomPropertyProps {
 }
 
 export const PrivateProperty = (props:PrivatePropertyProps) =>{
-    const [content, setContent] = useState('' as any);
-    const [validation,setValidation] = useState()
+    const [content, setContent] = useState(props.content?props.content:'');
+    const [contenttype, setContenttype] = useState(props.contenttype?props.contenttype:'');
+    const [validation,setValidation] = useState(props.validation?props.validation:null)
 
     let params:string = '';
    
-    const fetchData = ()=>{
-      let url = '/content/get/'+params
-      FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
-      .then((data) => {
-        setContent(data.data);
-      })
-    }
-    useEffect(()=>{
-      params = props.contenttype?(props.contenttype+'/'+props.id):props.id+'';
-      fetchData();
-    },[props.id])
+    // const fetchData = ()=>{
+    //   if(!content){
+    //     let url = '/content/get/'+params
+    //     console.log('fullEdit_custom',url)
+    //     FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
+    //     .then((data) => {
+    //       setContent(data.data);
+    //       setContenttype(data.data.content_type)
+    //     })
+    //   }
+    // }
+    // useEffect(()=>{
+    //   if(props.type=='create')return;
+    //   if(props.id){
+    //     params = props.contenttype?(props.contenttype+'/'+props.id):props.id+'';
+    //     fetchData();
+    //   }
+    // },[props.id])
 
-    if( !content ){
-      return null
-    }else{
+    useEffect(()=>{
+      if(!content){
+        setContent(content)
+        setContenttype(content.content_type)
+      }
+    },[content])
+
+    if(props.type=='create'){
       return <div>
-      <form  ref={props.ref} >
-         <RenderFields mode='edit' type={content.content_type} data={content} validation={validation} />
-       </form>
-   </div>
+              <form  ref={props.ref} >
+                <RenderFields mode='edit' type={contenttype} data={''} validation={validation} />
+              </form>
+            </div>
+    }else{
+      if( !content ){
+       return null
+      }else{
+        return <div>
+            <form  ref={props.ref} >
+              <RenderFields mode='edit' type={content.content_type} data={content} validation={validation} />
+            </form>
+          </div>
+      }
     }
+
+
+    
     
    
 
