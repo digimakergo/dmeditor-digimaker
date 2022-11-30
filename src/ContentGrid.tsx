@@ -1,12 +1,11 @@
-import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined} from "@mui/icons-material";
-//@ts-ignore
-import { ToolRenderProps } from "dmeditor/ToolDefinition";
-import {BlockProperty} from 'dmeditor/BlockProperty';
-import {PropertyGroup, PropertyItem} from 'dmeditor/utils/Property';
-import { Ranger } from "dmeditor/utils/Ranger";
+import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings} from "@mui/icons-material";
+
+import { BlockProperty, ToolRenderProps } from "dmeditor";
+import { Ranger, isServer, PropertyGroup, PropertyItem} from "dmeditor/utils";
+import axios from 'axios';
 
 import Browse from 'digimaker-ui/Browse';
-//@ts-ignore
+
 import util,{FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState,useRef } from "react";
 import {IconButton,TextField,Select,MenuItem, ToggleButtonGroup,ToggleButton, Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
@@ -18,7 +17,7 @@ export interface DialogTitleProps {
   onClose: () => void;
 }
 
-const ContentGrid = (props:ToolRenderProps) =>{
+const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     const [ids, setIds] = useState(props.data.data as any);
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
@@ -26,6 +25,7 @@ const ContentGrid = (props:ToolRenderProps) =>{
     const [space, setSpace] = useState(props.data.settings.space);    
     const [columns, setColumns] = useState(props.data.settings.columns);
     const [adding, setAdding] = useState(props.adding);
+    const [html, setHtml] = useState({});
 
     const [limit, setLimit] = useState(10);
     const [sortby, setSortby] = useState(["priority desc", "published desc"]);
@@ -55,6 +55,19 @@ const ContentGrid = (props:ToolRenderProps) =>{
         setSourceType('dynamic')
       }
     };
+
+
+    const fetchHtml = (idArray:any)=>{
+      //process.env.DMEDITOR_CONTENT_VIEW
+      FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type=article&viewmode=editor_block&site=dmdemo')
+      .then(data=>{
+        let html = {};
+        for(let id of idArray){
+          html[id] = data.data[id]
+        }
+        setHtml(html)
+      });
+    }
 
     const onConfirmSelect= (list:any,type:string)=>{
       if(type=='one'){
@@ -86,10 +99,11 @@ const ContentGrid = (props:ToolRenderProps) =>{
         idsArray.push(item.id);
       }
       setIds(idsArray)
+      fetchHtml(idsArray)
       setAdding(false);
       setisChange(!isChange);
       let data = props.data;
-      props.onChange({...data, data: idsArray});
+      props.onChange({...data, data: idsArray, settings:{...data.settings, columns: columns}});
     }
 
     const onConfirmDynamic = ()=>{
@@ -140,6 +154,14 @@ const ContentGrid = (props:ToolRenderProps) =>{
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);
     };
+    
+
+    if(isServer()){
+        return <div className={"dm-columns columns-"+props.data.settings.columns}>        
+            {Object.keys(props.data.data).map(index=><div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />)}
+          </div>;
+    }
+
     return <div>
     <BlockProperty title="Content grid" active={props.active}>
         <PropertyGroup header='Settings'>
@@ -235,21 +257,26 @@ const ContentGrid = (props:ToolRenderProps) =>{
           <Button onClick={handleClose}>Cancel</Button>
         </DialogActions>
       </Dialog>}
-
-   
       
     {(ids.length===0||list.length==0)&&<div className="empty-message">Please select Content</div>}
     <div className={"dm-columns columns-"+columns}>
-        {list.map(item=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'>
-          <div className={'title'}>{item.title}</div>
-          <div dangerouslySetInnerHTML={{__html:item.coverimage}}></div>
-          <div dangerouslySetInnerHTML={{__html:item.summary}}></div>
+        {ids.map(id=><div style={{paddingLeft:space, paddingTop: space}}>
+          <div dangerouslySetInnerHTML={{__html: (html?html[id]:'') }} />
         </div>)}
     </div>
   </div>
 }
 
-export const  toolContentGrid =   { 
+const serverLoad = async (data:any)=>{
+      console.log('ids');
+      console.log(data.data);
+      let ids = data.data.join(',');
+      let resp = await axios.get('http://localhost:9210/api/site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
+      let result = {...data, data:resp.data.data};
+      return result;
+}
+
+export const toolContentGrid =   { 
     type: "content_grid",
     menu: {
       text: "Content grid",
@@ -257,5 +284,6 @@ export const  toolContentGrid =   {
       icon: <GridViewOutlined />,
     },
 initData: {type:'content_grid', data:[], settings:{contentType:'article', columns:3, space:5}},
-view: (props:{data:Array<any>})=><ContentGrid data={props.data} active={false} onChange={()=>{}} />,
+onServerLoad: serverLoad,
+view: (props:{data:Array<any>})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <ContentGrid {...props} /> }
