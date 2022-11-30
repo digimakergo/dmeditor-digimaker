@@ -1,9 +1,13 @@
 import Browse from 'digimaker-ui/Browse';
 //@ts-ignore
 import util,{FetchWithAuth} from 'digimaker-ui/util'
-import React,{ useEffect, useState,useRef } from "react";
+import { useEffect, useState,useRef } from "react";
 import {IconButton,TextField,Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import imageExtensions from 'image-extensions'
+import isUrl from 'is-url'
+import { Util } from "dmeditor/utils/Util";
+import React from 'react';
 
 export interface DialogProps {
   adding?: boolean;
@@ -18,6 +22,11 @@ export const BrowseLink = (props:DialogProps) =>{
     const [currentList, setCurrentList] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='select'?props.defalutValue.source.sourceData:{id:'',content_type:'article'});
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);
+      // if(sourceType=='input'){
+      //   setCurrentList({id:'',content_type:'article'})
+      // }else{
+      //   setInputUrl('')
+      // }
     };
     const onConfirmSelect= (list:any)=>{
       setCurrentList(list)
@@ -26,13 +35,13 @@ export const BrowseLink = (props:DialogProps) =>{
     const onConfirm = ()=>{
       if(sourceType=='input'){
         if(inputUrl==''){
-          alert('Please enter the url before confirm')
+          Util.error('Please enter the url before confirm')
          return  false    
         }
         props.onConfirm(inputUrl,'input')
       }else{
         if((currentList.id??'')==''){
-          alert('Please select a article  before confirm')
+          Util.error('Please select a article  before confirm')
           return  false    
         }
         props.onConfirm(currentList,'select')

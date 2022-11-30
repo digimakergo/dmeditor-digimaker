@@ -3,9 +3,13 @@
 import Browse from 'digimaker-ui/Browse';
 //@ts-ignore
 import util,{FetchWithAuth} from 'digimaker-ui/util'
-import React,{ useEffect, useState,useRef } from "react";
+import { useEffect, useState,useRef } from "react";
 import {IconButton,TextField, Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import imageExtensions from 'image-extensions'
+import isUrl from 'is-url'
+import { Util } from "dmeditor/utils/Util";
+import React from 'react';
 
 export interface DialogProps {
   adding?: boolean;
@@ -33,13 +37,17 @@ export const BrowseImage = (props:DialogProps) =>{
     const onConfirm = ()=>{
       if(sourceType=='input'){
         if(inputUrl==''){
-          alert('Please enter the url before confirm')
+          Util.error('Please enter the url before confirm')
          return  false    
+        }
+        if (!isImageUrl(inputUrl)) {
+          Util.error('URL is not an image')
+          return false  
         }
         props.onConfirm(inputUrl,'input')
       }else{
         if((currentList.image??'')==''){
-          alert('Please select a image  before confirm')
+          Util.error('Please select a image  before confirm')
          return  false    
         }
         props.onConfirm(currentList,'select')
@@ -51,6 +59,12 @@ export const BrowseImage = (props:DialogProps) =>{
       return;
       setAdding(false);
     };
+    const isImageUrl = (url:any) => {
+      if (!url) return false
+      if (!isUrl(url)) return false
+      const ext:any = new URL(url).pathname.split('.').pop()
+      return imageExtensions.includes(ext)
+    }
 
     return <div>
      {adding&& <Dialog 
