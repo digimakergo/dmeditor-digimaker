@@ -31,31 +31,24 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
 
     let params:string = '';
    
-    // const fetchData = ()=>{
-    //   if(!content){
-    //     let url = '/content/get/'+params
-    //     console.log('fullEdit_custom',url)
-    //     FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
-    //     .then((data) => {
-    //       setContent(data.data);
-    //       setContenttype(data.data.content_type)
-    //     })
-    //   }
-    // }
-    // useEffect(()=>{
-    //   if(props.type=='create')return;
-    //   if(props.id){
-    //     params = props.contenttype?(props.contenttype+'/'+props.id):props.id+'';
-    //     fetchData();
-    //   }
-    // },[props.id])
-
-    useEffect(()=>{
+    const fetchData = ()=>{
       if(!content){
-        setContent(content)
-        setContenttype(content.content_type)
+        let url = '/content/get/'+params
+        console.log('fullEdit_custom',url)
+        FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
+        .then((data) => {
+          setContent(data.data);
+          setContenttype(data.data.content_type)
+        })
       }
-    },[content])
+    }
+    useEffect(()=>{
+      if(props.type=='create')return;
+      if(props.id){
+        params = props.contenttype?(props.contenttype+'/'+props.id):props.id+'';
+        fetchData();
+      }
+    },[props.id])
 
     if(props.type=='create'){
       return <div>

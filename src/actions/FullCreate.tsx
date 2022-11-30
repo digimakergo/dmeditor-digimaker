@@ -91,7 +91,7 @@ export const FullCreate = (props:{id:number, afterAction:any})=>{
       imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
       customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,defalutProperty:props.defalutProperty})}
       preBlock={PreBlock}
-      hotToast={toast}
+      toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}
       pageTabActiveIndex={pageTabActiveIndex}
     /> 

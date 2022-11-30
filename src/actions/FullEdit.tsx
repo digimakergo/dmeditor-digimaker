@@ -120,7 +120,7 @@ export const FullEdit = (props:{id:number, afterAction:any})=>{
         imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
         customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,defalutProperty:props.defalutProperty})}
         preBlock={PreBlock}
-        hotToast={toast}
+        toast={toast}
         pageTab={()=> PrivateProperty({id:props.id,ref:formRef,validation:validation,content:content})}
         pageTabActiveIndex={pageTabActiveIndex}
         /> 
