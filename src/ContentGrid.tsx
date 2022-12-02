@@ -2,6 +2,8 @@ import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings} 
 
 import { BlockProperty, ToolRenderProps } from "dmeditor";
 import { Ranger, isServer, PropertyGroup, PropertyItem} from "dmeditor/utils";
+import { Util} from "dmeditor/utils/Util";
+// import { Dialog} from "dmeditor/utils/Dialog";
 import axios from 'axios';
 
 import Browse from 'digimaker-ui/Browse';
@@ -16,24 +18,28 @@ export interface DialogTitleProps {
   children?: React.ReactNode;
   onClose: () => void;
 }
+interface sourceInter {
+  sourceType:string,
+  sourceData?:{[propName:string]:any}
+}
 
 const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
-    const [ids, setIds] = useState(props.data.data as any);
+    // const [ids, setIds] = useState(props.data.data as any);
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
-    const [list, setList] = useState([] as any);
+    // const [list, setList] = useState([] as any);
     const [space, setSpace] = useState(props.data.settings.space);    
     const [columns, setColumns] = useState(props.data.settings.columns);
     const [adding, setAdding] = useState(props.adding);
-    const [html, setHtml] = useState({});
+    const [html, setHtml] = useState(props.data.data as any);
 
     const [limit, setLimit] = useState(10);
     const [sortby, setSortby] = useState(["priority desc", "published desc"]);
-    const [isChange, setisChange] = useState(false);
+    // const [isChange, setisChange] = useState(false);
     const [currentList, setCurrentList] = useState({id:'',parent_id:''});
     const [currentListM, setCurrentListM] = useState([] as any);
     const limitInputRef:any = useRef(null)
-    let level=10;
+    // let level=10;
     let sortbyArr=[{type1:'priority',type2:'desc'}, {type1:'published',type2:'desc'}]
 
 
@@ -60,12 +66,14 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     const fetchHtml = (idArray:any)=>{
       //process.env.DMEDITOR_CONTENT_VIEW
       FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type=article&viewmode=editor_block&site=dmdemo')
-      .then(data=>{
+      .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         let html = {};
         for(let id of idArray){
           html[id] = data.data[id]
         }
         setHtml(html)
+        let list = props.data;
+        props.onChange({...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...data.settings, columns: columns}});
       });
     }
 
@@ -91,63 +99,57 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     const onConfirmFixed = ()=>{
       if(currentListM.length==0){
-        alert('Please select a file  before confirm')
+        Util.error('Please select a file  before confirm')
        return  false    
       }
       let idsArray:Array<any> = [];
       for(var item of currentListM){
         idsArray.push(item.id);
       }
-      setIds(idsArray)
+      // setIds(idsArray)
       fetchHtml(idsArray)
       setAdding(false);
-      setisChange(!isChange);
-      let data = props.data;
-      props.onChange({...data, data: idsArray, settings:{...data.settings, columns: columns}});
+      // setisChange(!isChange);
+     
     }
 
     const onConfirmDynamic = ()=>{
       if(!((currentList.id??'')!=='')){
-        alert('This is a warning alert — check it out!')
+        Util.error('Please select a file  before confirm')
         return;
       }
       let idsArray:Array<any> = [];
       idsArray.push(currentList.id);
-      setIds(idsArray)
+      // setIds(idsArray)
       setAdding(false);
-      setisChange(!isChange);
+      // setisChange(!isChange);
       setLimit(limitInputRef.current.firstChild.firstChild.value)
       let data = props.data;
       let settings={contentType:'article', columns:3, max:limitInputRef.current.firstChild.firstChild.value, source:{type:'dynamic', parent:currentList.id, sortby:sortby }};
         props.onChange({...data, content:[[]],settings:{...data.settings,...settings}});
     }
 
-    const getList = ()=>{
-      if( ids.length > 0 ){
-        if(sourceType=='fixed'){
-          FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/article?id='+ids.join(',')).then(data=>{
-              setList(data.data.list);
-          });
-        }else{
-          FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/article?parent='+ids.join(',')+'&limit='+limit+'&sortby='+sortby+'&level='+level).then(data=>{
-            setList(data.data.list);
-          });
-        }
-      }
-    }
-    useEffect(()=>{
-      getList();
-    },[isChange]);
+    // const getList = ()=>{
+    //   if( ids.length > 0 ){
+    //     if(sourceType=='fixed'){
+    //       FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/article?id='+ids.join(',')).then(data=>{
+    //           setList(data.data.list);
+    //       });
+    //     }else{
+    //       FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/article?parent='+ids.join(',')+'&limit='+limit+'&sortby='+sortby+'&level='+level).then(data=>{
+    //         setList(data.data.list);
+    //       });
+    //     }
+    //   }
+    // }
+    // useEffect(()=>{
+    //   getList();
+    // },[isChange]);
 
 
-    const handleChange = (e:any,index:any) => {
+    const handleChange = (val:any,index:any,type:string) => {
       let sortbys=[...sortby]
-      sortbys[index]=e.target.value+' '+sortbys[index].split(' ')[1]
-      setSortby([...sortbys])
-    };
-    const handleSortChange =(e:any,val: any,index:any) => {
-      let sortbys=[...sortby]
-      sortbys[index]=sortbys[index].split(' ')[0]+' '+val
+      sortbys[index]=type==='type1'?val+' '+sortbys[index].split(' ')[1]:sortbys[index].split(' ')[0]+' '+val
       setSortby([...sortbys])
     };
 
@@ -158,7 +160,9 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     if(isServer()){
         return <div className={"dm-columns columns-"+props.data.settings.columns}>        
-            {Object.keys(props.data.data).map(index=><div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />)}
+            {Object.keys(props.data.data).map(index=><div style={{paddingLeft:space, paddingTop: space}}>
+              <div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />
+              </div>)}
           </div>;
     }
 
@@ -166,10 +170,10 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     <BlockProperty title="Content grid" active={props.active}>
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
-                <Ranger min={1} max={6} defaultValue={columns} onChange={v=>setColumns(v)} />
+                <Ranger min={1} max={6} defaultValue={columns} onChange={(v: any)=>setColumns(v)} />
             </PropertyItem>
             <PropertyItem label='Space'>
-                <Ranger min={1} max={20} defaultValue={space} onChange={v=>setSpace(v)} />
+                <Ranger min={1} max={20} defaultValue={space} onChange={(v: any)=>setSpace(v)} />
             </PropertyItem>
             <PropertyItem label='Source'>
                 {selectSourceType}
@@ -177,6 +181,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
             </PropertyItem>
         </PropertyGroup>
     </BlockProperty>
+    {/* <Dialog/> */}
     {adding&& <Dialog 
         fullWidth={true}
         maxWidth={'md'}
@@ -215,13 +220,13 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
               <div>
                 {sortbyArr.map((item,index)=>{
                   return (
-                    <div style={{display:"flex",margin:'0  0 10px 10px'}}>
+                    <div key={index} style={{display:"flex",margin:'0  0 10px 10px'}}>
                       <Select
                         sx={{ minWidth: 300,marginRight:'10px'}}
                         size="small"
                         defaultValue={item.type1}
                         value={sortby.length>0?sortby[index].split(' ')[0]:item.type1}
-                        onChange={(e)=>{handleChange(e,index)}}
+                        onChange={(e)=>{handleChange(e.target.value,index,'type1')}}
                       >
                         <MenuItem value={"priority"}>priority</MenuItem>
                         <MenuItem value={'published'}>published</MenuItem>
@@ -230,7 +235,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
                       <ToggleButtonGroup
                         value={sortby.length>0?sortby[index].split(' ')[1]:item.type2}
                         exclusive
-                        onChange={(e,val)=>handleSortChange(e,val,index)}
+                        onChange={(e,val)=>handleChange(val,index,'type2')}
                         aria-label="text alignment"
                       >
                         <ToggleButton value="desc" >
@@ -258,12 +263,15 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
         </DialogActions>
       </Dialog>}
       
-    {(ids.length===0||list.length==0)&&<div className="empty-message">Please select Content</div>}
-    <div className={"dm-columns columns-"+columns}>
-        {ids.map(id=><div style={{paddingLeft:space, paddingTop: space}}>
-          <div dangerouslySetInnerHTML={{__html: (html?html[id]:'') }} />
-        </div>)}
-    </div>
+    {(Object.keys(html).length===0&&html.constructor===Object)?<div className="empty-message">Please select Content</div>
+    :<div className={"dm-columns columns-"+columns}>
+        {Object.keys(html).map(id=>
+          <div style={{paddingLeft:space, paddingTop: space}}>
+            <div dangerouslySetInnerHTML={{__html: (html?html[id]:'') }} />
+          </div>
+        )}
+      </div>
+    }
   </div>
 }
 

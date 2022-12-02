@@ -2,21 +2,25 @@ import {  SquareOutlined} from "@mui/icons-material";
 //@ts-ignore
 import { ToolRenderProps } from "dmeditor/ToolDefinition";
 import {BlockProperty} from 'dmeditor/BlockProperty';
-import {PropertyGroup, PropertyItem} from 'dmeditor/utils/Property';
+import {PropertyGroup, PropertyItem,isServer} from "dmeditor/utils";
+import { Util} from "dmeditor/utils/Util";
+import axios from 'axios';
 
 import Browse from 'digimaker-ui/Browse';
 //@ts-ignore
 import util,{FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState } from "react";
-import { Button } from "@mui/material";
+import { Button,Dialog,DialogActions,DialogContent,DialogTitle,IconButton } from "@mui/material";
+import CloseIcon from '@mui/icons-material/Close';
 
 
 const EmbedContent = (props:ToolRenderProps) =>{
   const [ids, setIds] = useState(props.data.data as any);
-  const [list, setList] = useState([] as any);
+  const [list, setList] = useState({} as any);
   const [columns, setColumns] = useState(1);
   const [adding, setAdding] = useState(props.adding);
   const [isChange, setisChange] = useState(false);
+  const [html, setHtml] = useState(props.data.data as any);
 
   const handleClickOpen = () => {
     setAdding(true);
@@ -31,44 +35,72 @@ const EmbedContent = (props:ToolRenderProps) =>{
     // props.onCancel();
   };
  
+  const onConfirmSelect= (list:any)=>{
+    setList(list);
+  }
 
-  const onConfirm = (list:any)=>{
-    if((list??'')===''){
-      alert('Please select a file  before confirm')
+  const onConfirm = ()=>{
+    if(Object.keys(list).length===0){
+      Util.error('Please select a file  before confirm')
      return  false    
     }
     
     let idsArray:Array<any> = [];
       idsArray.push(list.id);
     
-    let listArray:Array<any> = [];
-    listArray.push(list);
-    setList(listArray);
-    setIds(idsArray)
+    // let listArray:Array<any> = [];
+    // listArray.push(list);
+    setList({...list});
+    fetchHtml(idsArray);
+    // setIds(idsArray)
     setAdding(false);
-    setisChange(!isChange);
-    let data = props.data;
-      props.onChange({...data, data: idsArray});
+    // setisChange(!isChange);
+    // let data = props.data;
+    //   props.onChange({...data, data: idsArray});
        
   }
 
-  const getList = ()=>{
-    if( ids.length > 0 ){
-      FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/get/'+ids.join(',')).then(data=>{
-        let listArray:Array<any> = [];
-        listArray.push(data.data);
-          setList(listArray);
-      });
-    }
+  const fetchHtml = (idArray:any)=>{
+    //process.env.DMEDITOR_CONTENT_VIEW
+    FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type='+list.content_type+'&viewmode=editor_embed&site=dmdemo')
+    .then((data: { data: { [x: string]: any; }; settings: any; })=>{
+      let html = {};
+      for(let id of idArray){
+        html[id] = data.data[id]
+      }
+      setHtml(html)
+      let list = props.data;
+      props.onChange({...list, data: html,source:{sourceType:list.content_type,sourceData:list}});
+      // props.onChange({...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...data.settings, columns: columns}});
+    });
   }
 
-  useEffect(()=>{
-    getList()
-  },[isChange]);
+  // const getList = ()=>{
+  //   if( ids.length > 0 ){
+  //     FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/get/'+ids.join(',')).then(data=>{
+  //       let listArray:Array<any> = [];
+  //       listArray.push(data.data);
+  //         setList(listArray);
+  //     });
+  //   }
+  // }
+
+  // useEffect(()=>{
+  //   getList()
+  // },[isChange]);
 
   const showHtml = (ComponentTag)=>{
     return <>{ComponentTag}</>
   }
+
+  if(isServer()){
+    return <div className={"dm-columns columns-"+props.data.settings.columns}>        
+        {Object.keys(props.data.data).map(index=><div style={{display:'inline-block'}} className='Embed-list'>
+          <div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />
+          </div>)}
+      </div>;
+}
+
 
   return <div>
   <BlockProperty title="Embed content" active={props.active}>
@@ -78,20 +110,58 @@ const EmbedContent = (props:ToolRenderProps) =>{
             </PropertyItem>
       </PropertyGroup>
   </BlockProperty>
-  {adding&& <div >
-      <Browse multi={false} trigger={true} selected={''} contenttype={['article',"folder"]} onCancel={handleClose}  onConfirm={onConfirm} /> 
-  </div>}
+  {adding&&<><Dialog 
+      fullWidth={true}
+      maxWidth={'md'}
+      onClose={handleClose}
+      open={adding}>
+        <DialogTitle>Select
+          {(
+            <IconButton
+              aria-label="close"
+              onClick={handleClose}
+              sx={{
+                position: 'absolute',
+                right: 8,
+                top: 8,
+                color: (theme) => theme.palette.grey[500],
+              }}
+            >
+              <CloseIcon />
+            </IconButton>
+          )}
+        </DialogTitle>
+        <DialogContent>
+          <div className="tab-content">
+            <Browse inline={true}  multi={false} trigger={true} selected={Object.keys(list).length===0&&list.constructor===Object?'':list} contenttype={['article',"folder"]}  onConfirm={onConfirmSelect} /> 
+          </div>
+        </DialogContent>
+        <DialogActions>
+          <Button onClick={onConfirm} autoFocus> Confirm</Button>
+          <Button onClick={handleClose}>Cancel</Button>
+        </DialogActions>
+      </Dialog>
+  </>}
 
-  {(ids.length===0||((list??'')===''))&&<div className="empty-message">Please select Content</div>}
-  <div className={"dm-columns columns-"+columns}>
-     {list.map(item=><div style={{display:'inline-block'}} className='Embed-list'>
-          <div className={'title'}>{item.title}</div>
-          <div dangerouslySetInnerHTML={{__html:item.coverimage}}></div>
-          <div dangerouslySetInnerHTML={{__html:item.summary}}></div>
+  {(Object.keys(html).length===0&&html.constructor===Object)?<div className="empty-message">Please select Content</div>
+  : <div className={"dm-columns columns-"+columns}>
+     {Object.keys(html).map(id=><div style={{display:'inline-block'}} className='Embed-list'>
+          {/* <div className={'title'}>{html[id].title}</div>
+          <div dangerouslySetInnerHTML={{__html:html[id].coverimage}}></div> */}
+          <div dangerouslySetInnerHTML={{__html:(html?html[id]:'')}}></div>
         </div>)}
-  </div>
+  </div>}
   </div>
 
+}
+
+const serverLoad = async (data:any)=>{
+  console.log('ids');
+  console.log(data.data);
+  let ids = data.data.join(',');
+  let resp = await axios.get('http://localhost:9210/api/site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
+  let result = {...data, data:resp.data.data};
+  return result;
 }
 
 export const  toolEmbedContent =   { 
@@ -102,5 +172,6 @@ menu: {
   icon: <SquareOutlined />,
 },
 initData: {type:'content_Embed', data:[], settings:{contentType:'article'}},
+onServerLoad: serverLoad,
 view: (props:{data:Array<any>})=><EmbedContent data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <EmbedContent {...props} /> }
