@@ -1,4 +1,4 @@
-import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings} from "@mui/icons-material";
+import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings, SwapCallsRounded} from "@mui/icons-material";
 
 import { BlockProperty, ToolRenderProps } from "dmeditor";
 import { Ranger, isServer, PropertyGroup, PropertyItem} from "dmeditor/utils";
@@ -30,6 +30,8 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     // const [list, setList] = useState([] as any);
     const [space, setSpace] = useState(props.data.settings.space);    
     const [columns, setColumns] = useState(props.data.settings.columns);
+    const [viewMode,setViewMode] = useState(props.data.settings.viewMode?props.data.settings.viewMode:'editor_block');
+    const [isChange,setIsChange] = useState(false);
     const [adding, setAdding] = useState(props.adding);
     const [html, setHtml] = useState(props.data.data as any);
 
@@ -63,18 +65,26 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     };
 
 
-    const fetchHtml = (idArray:any)=>{
+    const fetchHtml = (idArray:any,type:string)=>{
       //process.env.DMEDITOR_CONTENT_VIEW
-      FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type=article&viewmode=editor_block&site=dmdemo')
+      FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type=article&viewmode='+viewMode+'&site=dmdemo')
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
-        let html = {};
+        let html:any = {};
         for(let id of idArray){
           html[id] = data.data[id]
         }
         setHtml(html)
         let list = props.data;
-        props.onChange({...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...data.settings, columns: columns}});
-      });
+        if(type==='fixed'){
+          props.onChange({...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}});
+          console.log("fixed data",{...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}})
+        }else{
+          let data = props.data;
+          let settings={contentType:'article', columns:3,space:space,viewMode:viewMode, max:limit, source:{type:'dynamic', parent:currentList.id, sortby:sortby }};
+            props.onChange({...data, content:[[]],source:{sourceType:'dynamic',sourceData:currentList},settings:{...data.settings,...settings}});
+            console.log("dynamic data",{...data, content:[[]],source:{sourceType:'dynamic',sourceData:currentList},settings:{...data.settings,...settings}});
+        }
+       });
     }
 
     const onConfirmSelect= (list:any,type:string)=>{
@@ -107,10 +117,9 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
         idsArray.push(item.id);
       }
       // setIds(idsArray)
-      fetchHtml(idsArray)
+      fetchHtml(idsArray,'fixed')
       setAdding(false);
       // setisChange(!isChange);
-     
     }
 
     const onConfirmDynamic = ()=>{
@@ -121,12 +130,11 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       let idsArray:Array<any> = [];
       idsArray.push(currentList.id);
       // setIds(idsArray)
+      // setLimit(limitInputRef.current.firstChild.firstChild.value)
+      fetchHtml(idsArray,'dynamic')
       setAdding(false);
       // setisChange(!isChange);
-      setLimit(limitInputRef.current.firstChild.firstChild.value)
-      let data = props.data;
-      let settings={contentType:'article', columns:3, max:limitInputRef.current.firstChild.firstChild.value, source:{type:'dynamic', parent:currentList.id, sortby:sortby }};
-        props.onChange({...data, content:[[]],settings:{...data.settings,...settings}});
+     
     }
 
     // const getList = ()=>{
@@ -156,6 +164,17 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);
     };
+
+    useEffect(()=>{
+      if(isChange){
+        if(selectSourceType==='fixed'){
+          let list = props.data;
+          props.onChange({...list, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}});
+          setIsChange(false)
+          console.log("fixed settings",{...list, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}})
+        }
+      }
+    },[isChange])
     
 
     if(isServer()){
@@ -170,10 +189,22 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     <BlockProperty title="Content grid" active={props.active}>
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
-                <Ranger min={1} max={6} defaultValue={columns} onChange={(v: any)=>setColumns(v)} />
+                <Ranger min={1} max={6} defaultValue={columns} onChange={(v: any)=>{setColumns(v); setIsChange(true)}} />
             </PropertyItem>
             <PropertyItem label='Space'>
-                <Ranger min={1} max={20} defaultValue={space} onChange={(v: any)=>setSpace(v)} />
+                <Ranger min={1} max={20} defaultValue={space} onChange={(v: any)=>{setSpace(v); setIsChange(true)}} />
+            </PropertyItem>
+            <PropertyItem label='View mode'>
+                <Select
+                  fullWidth
+                  size="small"
+                  defaultValue={viewMode}
+                  value={viewMode}
+                  onChange={(e)=>{setViewMode(e.target.value);setIsChange(true)}}
+                >
+                  <MenuItem value={"editor_block"}>block</MenuItem>
+                  <MenuItem value={'editor_line'}>list</MenuItem>
+                </Select>
             </PropertyItem>
             <PropertyItem label='Source'>
                 {selectSourceType}
@@ -253,7 +284,8 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
             </div>
             <div>
               <label style={{width:'60px'}}>Limit:</label>
-              <TextField ref={limitInputRef} sx={{marginLeft:'10px'}} size="small" variant="outlined" defaultValue={limit} />
+              {/* ref={limitInputRef} */}
+              <TextField  sx={{marginLeft:'10px'}} size="small" variant="outlined" defaultValue={limit} onChange={(event:any)=>setLimit(event.target.value)} />
             </div>
           </div>}
         </DialogContent>
