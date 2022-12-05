@@ -38,7 +38,7 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
         FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
         .then((data) => {
           setContent(data.data);
-          setContenttype(data.data.content_type)
+          setContenttype(data.data.metadata.contenttype)
         })
       }
     }
@@ -62,7 +62,7 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
       }else{
         return <div>
             <form  ref={props.ref} >
-              <RenderFields mode='edit' type={content.content_type} data={content} validation={validation} />
+              <RenderFields mode='edit' type={content.metadata.contenttype} data={content} validation={validation} />
             </form>
           </div>
       }
