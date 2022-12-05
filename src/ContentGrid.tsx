@@ -308,12 +308,21 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 }
 
 const serverLoad = async (data:any)=>{
-      console.log('ids');
-      console.log(data.data);
-      let ids = data.data.join(',');
-      let resp = await axios.get('http://localhost:9210/api/site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
-      let result = {...data, data:resp.data.data};
-      return result;
+      let sourceData = data.source.sourceData;
+      if( sourceData ){
+        console.log('ids');
+        let ids = [];
+        for(let item of sourceData ){
+          ids.push(item['id']);
+        }
+        console.log(ids);
+        let idStr = ids.join(',');
+        let resp = await axios.get('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idStr+'&type=article&viewmode=editor_block&site=dmdemo');
+        let result = {...data, data:resp.data.data};
+        return result;
+      }else{
+        return {};
+      }
 }
 
 export const toolContentGrid =   { 
