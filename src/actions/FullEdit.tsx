@@ -66,7 +66,7 @@ export const FullEdit = (props:{id:number, afterAction:any})=>{
         });
     },[props.id]);
 
-    if( !content || !data ){
+    if( !content ){
         return <div style={{position:'absolute'}}>...</div>;
     }
 
