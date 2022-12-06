@@ -13,7 +13,7 @@ import toast from 'react-hot-toast';
 export const FullEdit = (props:{id:number, afterAction:any})=>{
     const [content, setContent] = useState<any>(null);
 
-    const [data, setData] = useState(null as any);
+    const [data, setData] = useState(false as any);
     const [activeIndex, setActiveIndex] = useState(-1);
     const [validation,setValidation] = useState();
     const [pageTabActiveIndex,setPageTabActiveIndex] = useState(0);
@@ -66,7 +66,7 @@ export const FullEdit = (props:{id:number, afterAction:any})=>{
         });
     },[props.id]);
 
-    if( !content ){
+    if( !content || data===false ){
         return <div style={{position:'absolute'}}>...</div>;
     }
 
