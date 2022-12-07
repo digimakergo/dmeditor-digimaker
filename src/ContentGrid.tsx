@@ -18,16 +18,28 @@ export interface DialogTitleProps {
   children?: React.ReactNode;
   onClose: () => void;
 }
-interface sourceInter {
+
+interface soureDataType {
   sourceType:string,
-  sourceData?:{[propName:string]:any}
+  soureData: Array<soureDataFixedType|soureDataDynamicType>,
+}
+
+interface soureDataFixedType {
+  id:number;
+  contentType:string;
+}
+
+interface soureDataDynamicType {
+  parent:number;
+  contentType:string;
+  number:number;
+  sortby:string[];
 }
 
 const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     // const [ids, setIds] = useState(props.data.data as any);
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
-    // const [list, setList] = useState([] as any);
     const [space, setSpace] = useState(props.data.settings.space);    
     const [columns, setColumns] = useState(props.data.settings.columns);
     const [viewMode,setViewMode] = useState(props.data.settings.viewMode?props.data.settings.viewMode:'editor_block');
@@ -37,14 +49,11 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     const [limit, setLimit] = useState(10);
     const [sortby, setSortby] = useState(["priority desc", "published desc"]);
-    // const [isChange, setisChange] = useState(false);
-    const [currentList, setCurrentList] = useState({id:'',parent_id:''});
+    
+    const [currentList, setCurrentList] = useState({} as any);
     const [currentListM, setCurrentListM] = useState([] as any);
-    const limitInputRef:any = useRef(null)
     // let level=10;
     let sortbyArr=[{type1:'priority',type2:'desc'}, {type1:'published',type2:'desc'}]
-
-
 
     const handleClickOpen = () => {
       setAdding(true);
@@ -65,25 +74,25 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     };
 
 
-    const fetchHtml = (idArray:any,type:string)=>{
-      //process.env.DMEDITOR_CONTENT_VIEW
-      FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type=article&viewmode='+viewMode+'&site=dmdemo')
+    const fetchHtmlFixed = (idArray:any,mode?:string)=>{
+      let newViewMode=mode?mode:viewMode
+      FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${idArray.join(',')}&type=article&viewmode=${newViewMode}&site=dmdemo`)
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
-        let html:any = {};
-        for(let id of idArray){
-          html[id] = data.data[id]
-        }
-        setHtml(html)
-        let list = props.data;
-        if(type==='fixed'){
-          props.onChange({...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}});
-          console.log("fixed data",{...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}})
-        }else{
-          let data = props.data;
-          let settings={contentType:'article', columns:3,space:space,viewMode:viewMode, max:limit, source:{type:'dynamic', parent:currentList.id, sortby:sortby }};
-            props.onChange({...data, content:[[]],source:{sourceType:'dynamic',sourceData:currentList},settings:{...data.settings,...settings}});
-            console.log("dynamic data",{...data, content:[[]],source:{sourceType:'dynamic',sourceData:currentList},settings:{...data.settings,...settings}});
-        }
+        setHtml(data.data)
+        let propsData = props.data;
+        let sourceData:Array<soureDataFixedType>=currentListM.map(item=>{return {id:item.id,contentType:item.metadata.contenttype}})
+        props.onChange({...propsData,data:data.data,source:{sourceType:'fixed',sourceData:sourceData}, settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
+      });
+    }
+
+    const fetchHtmlDynamic = (parent:any,mode?:string)=>{
+      let newViewMode=mode?mode:viewMode
+      FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?parent=${parent}&limt=${limit}&sortby=${sortby}&type=article&viewmode=${newViewMode}&site=dmdemo`)
+      .then((data: { data: { [x: string]: any; }; settings: any; })=>{
+        setHtml(data.data)
+        let propsData = props.data;
+        let sourceData:soureDataDynamicType={parent:parent,contentType:currentList.metadata.contenttype,number:limit,sortby:sortby}
+        props.onChange({...propsData, data:data.data,source:{sourceType:'dynamic',sourceData:sourceData},settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
        });
     }
 
@@ -98,7 +107,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     const onConfirm = ()=>{
       if(sourceType=='fixed'){
         onConfirmFixed();
-        setCurrentList({id:'',parent_id:''})
+        setCurrentList({})
         setSelectSourceType('fixed')
       }else{
         onConfirmDynamic();
@@ -116,44 +125,37 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       for(var item of currentListM){
         idsArray.push(item.id);
       }
-      // setIds(idsArray)
-      fetchHtml(idsArray,'fixed')
+      fetchHtmlFixed(idsArray)
       setAdding(false);
-      // setisChange(!isChange);
     }
 
     const onConfirmDynamic = ()=>{
-      if(!((currentList.id??'')!=='')){
+      if(Object.keys(currentList).length===0){
         Util.error('Please select a file  before confirm')
         return;
       }
-      let idsArray:Array<any> = [];
-      idsArray.push(currentList.id);
-      // setIds(idsArray)
-      // setLimit(limitInputRef.current.firstChild.firstChild.value)
-      fetchHtml(idsArray,'dynamic')
+      fetchHtmlDynamic(currentList.location.id)
       setAdding(false);
-      // setisChange(!isChange);
-     
+    }
+ 
+    const onChangeViewMode = (e:any)=>{
+      setViewMode(e.target.value);
+      if(sourceType=='fixed'){
+        if(currentListM.length==0)return;
+        let idsArray:Array<any> = [];
+        for(var item of currentListM){
+          idsArray.push(item.id);
+        }
+        fetchHtmlFixed(idsArray,e.target.value)
+      }else{
+        if(Object.keys(currentList).length===0)return;
+        fetchHtmlDynamic(currentList.location.id,e.target.value)
+      }
     }
 
-    // const getList = ()=>{
-    //   if( ids.length > 0 ){
-    //     if(sourceType=='fixed'){
-    //       FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/article?id='+ids.join(',')).then(data=>{
-    //           setList(data.data.list);
-    //       });
-    //     }else{
-    //       FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/article?parent='+ids.join(',')+'&limit='+limit+'&sortby='+sortby+'&level='+level).then(data=>{
-    //         setList(data.data.list);
-    //       });
-    //     }
-    //   }
-    // }
-    // useEffect(()=>{
-    //   getList();
-    // },[isChange]);
-
+    const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
+      setSourceType(newValue);
+    };
 
     const handleChange = (val:any,index:any,type:string) => {
       let sortbys=[...sortby]
@@ -161,18 +163,11 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       setSortby([...sortbys])
     };
 
-    const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
-      setSourceType(newValue);
-    };
-
     useEffect(()=>{
       if(isChange){
-        if(selectSourceType==='fixed'){
-          let list = props.data;
-          props.onChange({...list, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}});
+          let propsData = props.data;
+          props.onChange({...propsData, settings:{...propsData.settings, columns: columns,space:space,viewMode:viewMode}});
           setIsChange(false)
-          console.log("fixed settings",{...list, settings:{...list.settings, columns: columns,space:space,viewMode:viewMode}})
-        }
       }
     },[isChange])
     
@@ -200,7 +195,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
                   size="small"
                   defaultValue={viewMode}
                   value={viewMode}
-                  onChange={(e)=>{setViewMode(e.target.value);setIsChange(true)}}
+                  onChange={(e)=>{onChangeViewMode(e)}}
                 >
                   <MenuItem value={"editor_block"}>block</MenuItem>
                   <MenuItem value={'editor_line'}>list</MenuItem>
@@ -212,7 +207,6 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
             </PropertyItem>
         </PropertyGroup>
     </BlockProperty>
-    {/* <Dialog/> */}
     {adding&& <Dialog 
         fullWidth={true}
         maxWidth={'md'}
@@ -245,7 +239,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
             <Browse inline={true}  multi={true} trigger={true} selected={currentListM} contenttype={['article']}  onConfirm={(value:any)=>{onConfirmSelect(value,'more')}} /> 
           </div>}
           {sourceType=="dynamic"&&<div className="tab-content">
-            <Browse  inline={true} multi={false} trigger={true} selected={currentList.id==''?'':currentList} contenttype={['folder']} onCancel={props.onCancel} onConfirm={(value:any)=>{onConfirmSelect(value,'one')}}/>
+            <Browse  inline={true} multi={false} trigger={true} selected={Object.keys(currentList).length===0?'':currentList} contenttype={['folder']} onCancel={props.onCancel} onConfirm={(value:any)=>{onConfirmSelect(value,'one')}}/>
             <div style={{display:"flex",marginTop:'15px'}}>
               <label style={{width:'60px'}}>Order:</label>
               <div>
@@ -284,7 +278,6 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
             </div>
             <div>
               <label style={{width:'60px'}}>Limit:</label>
-              {/* ref={limitInputRef} */}
               <TextField  sx={{marginLeft:'10px'}} size="small" variant="outlined" defaultValue={limit} onChange={(event:any)=>setLimit(event.target.value)} />
             </div>
           </div>}
@@ -295,7 +288,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
         </DialogActions>
       </Dialog>}
       
-    {(Object.keys(html).length===0&&html.constructor===Object)?<div className="empty-message">Please select Content</div>
+    {Object.keys(html).length===0?<div className="empty-message">Please select Content</div>
     :<div className={"dm-columns columns-"+columns}>
         {Object.keys(html).map(id=>
           <div style={{paddingLeft:space, paddingTop: space}}>
@@ -311,7 +304,7 @@ const serverLoad = async (data:any)=>{
       let sourceData = data.source.sourceData;
       if( sourceData ){
         console.log('ids');
-        let ids = [];
+        let ids:any = [];
         for(let item of sourceData ){
           ids.push(item['id']);
         }
@@ -332,7 +325,7 @@ export const toolContentGrid =   {
       category: "content",
       icon: <GridViewOutlined />,
     },
-initData: {type:'content_grid', data:[], settings:{contentType:'article', columns:3, space:5}},
+initData: {type:'content_grid', data:[], settings:{columns:3, space:5,viewMode:'editor_block'}},
 onServerLoad: serverLoad,
 view: (props:{data:Array<any>})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <ContentGrid {...props} /> }

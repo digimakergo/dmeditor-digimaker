@@ -13,13 +13,15 @@ import { useEffect, useState } from "react";
 import { Button,Dialog,DialogActions,DialogContent,DialogTitle,IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 
+interface soureDataType {
+  id:number;
+  contentType:string;
+}
 
 const EmbedContent = (props:ToolRenderProps) =>{
-  const [ids, setIds] = useState(props.data.data as any);
-  const [list, setList] = useState({} as any);
+  const [currentSource, setCurrentSource] = useState({} as any);
   const [columns, setColumns] = useState(1);
   const [adding, setAdding] = useState(props.adding);
-  const [isChange, setisChange] = useState(false);
   const [html, setHtml] = useState(props.data.data as any);
 
   const handleClickOpen = () => {
@@ -35,63 +37,29 @@ const EmbedContent = (props:ToolRenderProps) =>{
     // props.onCancel();
   };
  
-  const onConfirmSelect= (list:any)=>{
-    setList(list);
+  const onConfirmSelect= (source:any)=>{
+    setCurrentSource(source);
   }
 
   const onConfirm = ()=>{
-    if(Object.keys(list).length===0){
+    if(Object.keys(currentSource).length===0){
       Util.error('Please select a file  before confirm')
      return  false    
     }
-    
-    let idsArray:Array<any> = [];
-      idsArray.push(list.id);
-    
-    // let listArray:Array<any> = [];
-    // listArray.push(list);
-    setList({...list});
-    fetchHtml(idsArray);
-    // setIds(idsArray)
+    fetchHtml(currentSource.id);
     setAdding(false);
-    // setisChange(!isChange);
-    // let data = props.data;
-    //   props.onChange({...data, data: idsArray});
-       
   }
 
-  const fetchHtml = (idArray:any)=>{
-    //process.env.DMEDITOR_CONTENT_VIEW
-    FetchWithAuth('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idArray.join(',')+'&type='+list.content_type+'&viewmode=editor_embed&site=dmdemo')
+  const fetchHtml = (id:any)=>{
+    FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${id}&type=${currentSource.metadata.contenttype}&viewmode=editor_embed&site=dmdemo`)
     .then((data: { data: { [x: string]: any; }; settings: any; })=>{
-      let html = {};
-      for(let id of idArray){
-        html[id] = data.data[id]
-      }
-      setHtml(html)
-      let list = props.data;
-      props.onChange({...list, data: html,source:{sourceType:list.content_type,sourceData:list}});
-      // props.onChange({...list,data:html,source:{sourceType:'fixed',sourceData:currentListM}, settings:{...data.settings, columns: columns}});
+      setHtml(data.data)
+      let propsData = props.data;
+      let sourceData:soureDataType={id:id,contentType:currentSource.metadata.contenttype}
+      props.onChange({...propsData, data: data.data,source:sourceData});
     });
   }
-
-  // const getList = ()=>{
-  //   if( ids.length > 0 ){
-  //     FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/get/'+ids.join(',')).then(data=>{
-  //       let listArray:Array<any> = [];
-  //       listArray.push(data.data);
-  //         setList(listArray);
-  //     });
-  //   }
-  // }
-
-  // useEffect(()=>{
-  //   getList()
-  // },[isChange]);
-
-  const showHtml = (ComponentTag)=>{
-    return <>{ComponentTag}</>
-  }
+  
 
   if(isServer()){
     return <div className={"dm-columns columns-"+props.data.settings.columns}>        
@@ -133,7 +101,7 @@ const EmbedContent = (props:ToolRenderProps) =>{
         </DialogTitle>
         <DialogContent>
           <div className="tab-content">
-            <Browse inline={true}  multi={false} trigger={true} selected={Object.keys(list).length===0&&list.constructor===Object?'':list} contenttype={['article',"folder"]}  onConfirm={onConfirmSelect} /> 
+            <Browse inline={true}  multi={false} trigger={true} selected={Object.keys(currentSource).length===0&&currentSource.constructor===Object?'':currentSource} contenttype={['article',"folder"]}  onConfirm={onConfirmSelect} /> 
           </div>
         </DialogContent>
         <DialogActions>
@@ -143,11 +111,9 @@ const EmbedContent = (props:ToolRenderProps) =>{
       </Dialog>
   </>}
 
-  {(Object.keys(html).length===0&&html.constructor===Object)?<div className="empty-message">Please select Content</div>
+  {Object.keys(html).length===0?<div className="empty-message">Please select Content</div>
   : <div className={"dm-columns columns-"+columns}>
      {Object.keys(html).map(id=><div style={{display:'inline-block'}} className='Embed-list'>
-          {/* <div className={'title'}>{html[id].title}</div>
-          <div dangerouslySetInnerHTML={{__html:html[id].coverimage}}></div> */}
           <div dangerouslySetInnerHTML={{__html:(html?html[id]:'')}}></div>
         </div>)}
   </div>}

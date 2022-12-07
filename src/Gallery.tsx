@@ -12,58 +12,81 @@ import { Button, FormControlLabel, RadioGroup } from "@mui/material";
 
 
 const Gallery = (props:ToolRenderProps) =>{
-    const [ids, setIds] = useState(props.data.data as any);
+    const [ids, setIds] = useState(props.data.source.contentData as any);
     const [space, setSpace] = useState(props.data.settings.space);    
-    const [list, setList] = useState([] as any);
+    const [selectsource, setSelectsource] = useState([] as any);
     const [sourceType, setSourceType] = useState('fixed');
     const [columns, setColumns] = useState(props.data.settings.columns);
     const [adding, setAdding] = useState(props.adding);
+    const [isChange,setIsChange] = useState(false);
+
+    const handleClickOpen = () => {
+      setAdding(true);
+      setAdding(false);
+      setTimeout(()=>{setAdding(true);},10)
+    };
 
     const onConfirm = (list:any)=>{
         let ids:Array<any> = [];
+        let imgs:Array<any> = [];
         for(var item of list){
-            ids.push(item.cid);
+            ids.push(item.id);
+            imgs.push(item.image)
         }
-        setList(list);
+        setIds(ids)
+        setSelectsource(list);
         setAdding(false);
         let data = props.data;
-        props.onChange({...data, data: ids});
+        props.onChange({...data, data: imgs,source:{contentType:"image",contentData:ids}});
+        console.log("image data",{...data, data: imgs,source:{sourceType:"image",sourceData:ids}})
     }
 
     useEffect(()=>{
-        if( ids.length > 0 ){
+        if( ids.length > 0){
             FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then(data=>{
-                setList(data.data.list);
+              setSelectsource(data.data.list);
             });
         }
     },[]);
+
+    useEffect(()=>{
+      if(isChange){
+        if(sourceType==='fixed'){
+          let propsData = props.data;
+          props.onChange({...propsData, settings:{...propsData.settings, columns: columns,space:space}});
+          setIsChange(false)
+          console.log("gallery settings",{...propsData, settings:{...propsData.settings, columns: columns,space:space}})
+        }
+      }
+    },[isChange])
 
     return <div>
     <BlockProperty title="Gallery" active={props.active}>
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
-                <Ranger min={1} max={6} defaultValue={columns} onChange={v=>setColumns(v)} />
+                <Ranger min={1} max={6} defaultValue={columns} onChange={v=>{setColumns(v);setIsChange(true)}} />
             </PropertyItem>
             <PropertyItem label='Space'>
-                <Ranger min={1} max={20} defaultValue={space} onChange={v=>setSpace(v)} />
+                <Ranger min={1} max={20} defaultValue={space} onChange={v=>{setSpace(v);setIsChange(true)}} />
             </PropertyItem>
             <PropertyItem label='Source'>
-            <RadioGroup value={sourceType} onChange={e=>setSourceType(e.target.value)}>
+              {/* <RadioGroup value={sourceType} onChange={e=>setSourceType(e.target.value)}>
                 <FormControlLabel value="fixed" control={<Radio size="small" />} label="Fixed" />
                 <FormControlLabel value="dynamic" control={<Radio size="small" />} label="Dynamic" />
-                </RadioGroup>
-                <Button>Choose</Button>
+              </RadioGroup> */}
+              <Button onClick={handleClickOpen}>Choose</Button>
             </PropertyItem>
         </PropertyGroup>
     </BlockProperty>
     {adding&&<div>
-        <Browse parent={461} multi={true} trigger={true} selected={[]} contenttype={['image']} onCancel={props.onCancel} onConfirm={onConfirm} />
+        <Browse parent={461} multi={true} trigger={true} selected={selectsource} contenttype={['image']} onCancel={props.onCancel} onConfirm={onConfirm} />
         </div>}
 
-    {adding&&ids.length===0&&<div className="empty-message">Please select images</div>}
+    {Object.keys(selectsource).length===0?<div className="empty-message">Please select images</div>:
     <div className={"dm-columns columns-"+columns}>
-        {list.map(item=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={process.env.REACT_APP_ASSET_URL+'/'+item.image}></img></div>)}
+        {selectsource.map(item=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={process.env.REACT_APP_ASSET_URL+'/'+item.image}></img></div>)}
     </div>
+    }
     </div>
 }
 
