@@ -125,7 +125,7 @@ function BlockCarousel(props: ToolRenderProps) {
 
   return (
     <>
-      <BlockProperty title='Carousel' active={props.active}>
+      {props.active&&<BlockProperty>
         <PropertyGroup header="Settings">
           <PropertyItem label="Height">
             <Ranger
@@ -187,7 +187,7 @@ function BlockCarousel(props: ToolRenderProps) {
             />
           </PropertyItem>
         </PropertyGroup>
-      </BlockProperty>
+      </BlockProperty>}
       {adding && (
         <div>
           <Browse

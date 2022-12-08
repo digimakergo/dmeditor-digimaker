@@ -181,7 +181,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     }
 
     return <div>
-    <BlockProperty title="Content grid" active={props.active}>
+    {props.active&&<BlockProperty title="Content grid" active={props.active}>
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
                 <Ranger min={1} max={6} defaultValue={columns} onChange={(v: any)=>{setColumns(v); setIsChange(true)}} />
@@ -206,7 +206,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
                 <div><Button onClick={handleClickOpen}>Choose</Button></div>
             </PropertyItem>
         </PropertyGroup>
-    </BlockProperty>
+    </BlockProperty>}
     {adding&& <Dialog 
         fullWidth={true}
         maxWidth={'md'}

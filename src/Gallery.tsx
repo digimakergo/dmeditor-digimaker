@@ -59,7 +59,7 @@ const Gallery = (props:ToolRenderProps) =>{
     },[isChange])
 
     return <div>
-    <BlockProperty title="Gallery" active={props.active}>
+    {props.active&&<BlockProperty title="Gallery" active={props.active}>
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
                 <Ranger min={1} max={6} defaultValue={columns} onChange={v=>{setColumns(v);setIsChange(true)}} />
@@ -75,7 +75,7 @@ const Gallery = (props:ToolRenderProps) =>{
               <Button onClick={handleClickOpen}>Choose</Button>
             </PropertyItem>
         </PropertyGroup>
-    </BlockProperty>
+    </BlockProperty>}
     {adding&&<div>
         <Browse parent={461} multi={true} trigger={true} selected={selectsource} contenttype={['image']} onCancel={props.onCancel} onConfirm={onConfirm} />
         </div>}

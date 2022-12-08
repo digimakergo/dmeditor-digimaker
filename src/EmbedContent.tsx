@@ -71,13 +71,13 @@ const EmbedContent = (props:ToolRenderProps) =>{
 
 
   return <div>
-  <BlockProperty title="Embed content" active={props.active}>
+  {props.active&&<BlockProperty title="Embed content" active={props.active}>
       <PropertyGroup header='Settings'>
           <PropertyItem label='Source'>
               <Button onClick={handleClickOpen}>Choose</Button>
             </PropertyItem>
       </PropertyGroup>
-  </BlockProperty>
+  </BlockProperty>}
   {adding&&<><Dialog 
       fullWidth={true}
       maxWidth={'md'}
