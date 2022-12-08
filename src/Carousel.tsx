@@ -75,26 +75,54 @@ function BlockCarousel(props: ToolRenderProps) {
   const [interval, setInterval] = useState(() => {
     return props.data.settings.interval ? 5000 : null;
   });
-  const [list, setList] = useState<any[]>(() => {
+  const [ids, setIds] = useState<any[]>(() => {
+    return props.data.source? props.data.source.contentId:[]
+  });
+  const [selectsource, setSelectsource] = useState<any[]>(() => {
     return props.data.data;
   });
+  const [isChange,setIsChange] = useState(false);
+
   useEffect(() => {
-    if (list.length > 0) {
-      FetchWithAuth(
-        process.env.REACT_APP_REMOTE_URL +
-          "/content/list/image?cid=" +
-          list.join(",")
-      ).then((data: any) => {
-        setList(data.data.list);
+    if( ids.length > 0){
+      FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then(data=>{
+        setSelectsource(data.data.list);
       });
     }
   }, []);
+
+  useEffect(()=>{
+    if(isChange){
+      let propsData = props.data;
+      let settings={
+        height: height,
+        indicators: indicators,
+        fade: fade,
+        slide: slide,
+        controls: controls,
+        interval: interval,
+      };
+      props.onChange({...propsData, settings:{...propsData.settings, ...settings}});
+      setIsChange(false)
+    }
+  },[isChange])
+
   const onConfirm = (list: any) => {
-    setList(list);
+    let ids:Array<any> = [];
+    let imgs:Array<any> = [];
+      for(var item of list){
+          ids.push(item.id);
+          imgs.push(item.image)
+      }
+      setIds(ids)
+      setSelectsource(list);
+    let propsData = props.data;
+    props.onChange({...propsData, data: imgs,source:{contentType:"image",contentId:ids}});
   };
   const changeInterval = (e: React.ChangeEvent<HTMLInputElement>) => {
     setInterval(e.target.checked ? 5000 : null);
   };
+
   return (
     <>
       <BlockProperty title='Carousel' active={props.active}>
@@ -105,7 +133,7 @@ function BlockCarousel(props: ToolRenderProps) {
               max={500}
               step={1}
               value={height}
-              onChange={(v) => setHeight(v)}
+              onChange={(v) => {setHeight(v);setIsChange(true)}}
             />
           </PropertyItem>
           <PropertyItem label="Indicators">
@@ -113,6 +141,7 @@ function BlockCarousel(props: ToolRenderProps) {
               checked={indicators}
               onChange={(e) => {
                 setIndicators(e.target.checked);
+                setIsChange(true)
               }}
               sx={{ m: 1 }}
             />
@@ -122,6 +151,7 @@ function BlockCarousel(props: ToolRenderProps) {
               checked={slide}
               onChange={(e) => {
                 setSlide(e.target.checked);
+                setIsChange(true)
               }}
               sx={{ m: 1 }}
             />
@@ -131,6 +161,7 @@ function BlockCarousel(props: ToolRenderProps) {
               checked={fade}
               onChange={(e) => {
                 setFade(e.target.checked);
+                setIsChange(true)
               }}
               sx={{ m: 1 }}
             />
@@ -140,6 +171,7 @@ function BlockCarousel(props: ToolRenderProps) {
               checked={controls}
               onChange={(e) => {
                 setControls(e.target.checked);
+                setIsChange(true)
               }}
               sx={{ m: 1 }}
             />
@@ -148,6 +180,7 @@ function BlockCarousel(props: ToolRenderProps) {
             <IOSSwitch
               onChange={(event) => {
                 changeInterval(event);
+                setIsChange(true)
               }}
               checked={!!interval}
               sx={{ m: 1 }}
@@ -175,7 +208,7 @@ function BlockCarousel(props: ToolRenderProps) {
         controls={controls}
         slide={slide}
       >
-        {list.map((item, index) => {
+        {selectsource.map((item, index) => {
           return (
             <CarouselItem key={index}>
               <img

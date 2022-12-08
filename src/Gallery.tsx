@@ -12,7 +12,7 @@ import { Button, FormControlLabel, RadioGroup } from "@mui/material";
 
 
 const Gallery = (props:ToolRenderProps) =>{
-    const [ids, setIds] = useState(props.data.source.contentData as any);
+    const [ids, setIds] = useState(props.data.source? props.data.source.contentId:[]);
     const [space, setSpace] = useState(props.data.settings.space);    
     const [selectsource, setSelectsource] = useState([] as any);
     const [sourceType, setSourceType] = useState('fixed');
@@ -37,8 +37,7 @@ const Gallery = (props:ToolRenderProps) =>{
         setSelectsource(list);
         setAdding(false);
         let data = props.data;
-        props.onChange({...data, data: imgs,source:{contentType:"image",contentData:ids}});
-        console.log("image data",{...data, data: imgs,source:{sourceType:"image",sourceData:ids}})
+        props.onChange({...data, data: imgs,source:{contentType:"image",contentId:ids}});
     }
 
     useEffect(()=>{
@@ -55,7 +54,6 @@ const Gallery = (props:ToolRenderProps) =>{
           let propsData = props.data;
           props.onChange({...propsData, settings:{...propsData.settings, columns: columns,space:space}});
           setIsChange(false)
-          console.log("gallery settings",{...propsData, settings:{...propsData.settings, columns: columns,space:space}})
         }
       }
     },[isChange])
