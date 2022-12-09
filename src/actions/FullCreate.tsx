@@ -28,7 +28,7 @@ export const FullCreate = (props:{id:number, afterAction:any})=>{
       setAnchorEl(null);
       fetchWithAuth(process.env.REACT_APP_REMOTE_URL +'/content/create/article/' +props.id, {
         method:'POST', 
-        body:JSON.stringify({...dataObject,...{body_json:JSON.stringify(data)}}) 
+        body:JSON.stringify({...dataObject,...{fullbody:JSON.stringify(data)}}) 
       }).then(data=>{
           if(data.error === false){
               Util.message('Saved')
@@ -87,9 +87,10 @@ export const FullCreate = (props:{id:number, afterAction:any})=>{
       </div>}
       ids={props.id}
       data={data} 
-      onChange={(data,activeIndex)=>{setData(data);setActiveIndex(activeIndex)}}
+      onChangeActive={(activeIndex)=>setActiveIndex(activeIndex)}
+      onChange={(data)=>{setData(data)}}
       imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
-      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,defalutProperty:props.defalutProperty})}
+      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data})}
       preBlock={PreBlock}
       toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}

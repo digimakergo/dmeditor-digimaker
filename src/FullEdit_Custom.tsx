@@ -3,6 +3,7 @@ import React,{ useState,useEffect} from "react";
 import RenderFields from 'digimaker-ui/RenderFields';
 import {FetchWithAuth} from 'digimaker-ui/util';
 import { Select,MenuItem,FormControl} from "@mui/material";
+import { PropertyItem } from 'dmeditor/utils';
 
 export interface PrivatePropertyProps {
   id:any, 
@@ -13,15 +14,10 @@ export interface PrivatePropertyProps {
   content:any
   // afterAction:any
 }
-
-export interface contentInterface {
-  name:string, 
-  content_type:string, 
-}
-export interface CustomPropertyProps {
-  blockData?: any;
-  onChange: (data:any) => void;
-  defalutProperty?:any
+export interface CustomPropertyProps{
+  data?:any,
+  onChange?:any,
+  blockData?:any,
 }
 
 export const PrivateProperty = (props:PrivatePropertyProps) =>{
@@ -77,7 +73,7 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
 
 export const CustomProperty = (props:CustomPropertyProps) =>{
   const [blockData, setBlockData] = useState(props.blockData?props.blockData:[{type:'1',value:'cover_image'},{type:'2',value:'summary'}]);
-  const [property,setProperty] = useState(props.defalutProperty?props.defalutProperty:'')
+  const [property,setProperty] = useState(props.data.dm_field?props.data.dm_field:'')
  
   const changeFontFormat = (v:any,format:any,e?:any)=>{
     setProperty(v)
@@ -85,7 +81,7 @@ export const CustomProperty = (props:CustomPropertyProps) =>{
   }
  
 
-  return <div>
+  return <PropertyItem label="property">
    <Select
       size="small"
       fullWidth
@@ -104,7 +100,7 @@ export const CustomProperty = (props:CustomPropertyProps) =>{
       ))
       }
     </Select>
-</div>
+    </PropertyItem>
 
 }
 
