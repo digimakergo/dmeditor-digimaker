@@ -71,7 +71,7 @@ const EmbedContent = (props:ToolRenderProps) =>{
 
 
   return <div>
-  {props.active&&<BlockProperty title="Embed content" active={props.active}>
+  {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="content_embed">
       <PropertyGroup header='Settings'>
           <PropertyItem label='Source'>
               <Button onClick={handleClickOpen}>Choose</Button>
@@ -131,7 +131,7 @@ const serverLoad = async (data:any)=>{
 }
 
 export const  toolEmbedContent =   { 
-    type: "content_Embed",
+    type: "content_embed",
 menu: {
   text: "Embed content",
   category: "content",

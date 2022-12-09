@@ -59,7 +59,7 @@ const Gallery = (props:ToolRenderProps) =>{
     },[isChange])
 
     return <div>
-    {props.active&&<BlockProperty title="Gallery" active={props.active}>
+    {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="gallery">
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
                 <Ranger min={1} max={6} defaultValue={columns} onChange={v=>{setColumns(v);setIsChange(true)}} />

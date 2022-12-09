@@ -181,7 +181,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     }
 
     return <div>
-    {props.active&&<BlockProperty title="Content grid" active={props.active}>
+    {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="content_grid">
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
                 <Ranger min={1} max={6} defaultValue={columns} onChange={(v: any)=>{setColumns(v); setIsChange(true)}} />
