@@ -95,6 +95,8 @@ menu: {
   category: "content",
   icon: <CollectionsOutlined />,
 },
-initData: {type:'content_gallery', data:[], settings:{contentType:'image', columns:3, space:5}},
+initData: ()=>{
+  return {type:'content_gallery', data:[], settings:{contentType:'image', columns:3, space:5}};
+},
 view: (props:{data:Array<any>})=><Gallery data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <Gallery {...props} /> }

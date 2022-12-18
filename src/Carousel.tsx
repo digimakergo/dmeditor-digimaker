@@ -232,7 +232,8 @@ export const toolCarousel: ToolDefinition = {
     category: "content",
     icon: <CollectionsOutlined />,
   },
-  initData: {
+  initData: ()=>{
+    return {
     type: "carousel",
     data: [],
     settings: {
@@ -243,7 +244,7 @@ export const toolCarousel: ToolDefinition = {
       controls: true,
       interval: true,
     },
-  },
+  }},
   view: (props:{data:Array<any>})=><BlockCarousel data={props.data} active={false} onChange={()=>{}} />,
   render: (props: ToolRenderProps) => <BlockCarousel {...props} />,
 };
