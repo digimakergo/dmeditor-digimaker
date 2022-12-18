@@ -320,8 +320,8 @@ const serverLoad = async (data:any)=>{
 
 export const toolContentGrid =   { 
     type: "content_grid",
+    name: "Content grid",
     menu: {
-      text: "Content grid",
       category: "content",
       icon: <GridViewOutlined />,
     },

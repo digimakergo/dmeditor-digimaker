@@ -132,8 +132,8 @@ const serverLoad = async (data:any)=>{
 
 export const  toolEmbedContent =   { 
     type: "content_embed",
+    name: "Embed content",
 menu: {
-  text: "Embed content",
   category: "content",
   icon: <SquareOutlined />,
 },

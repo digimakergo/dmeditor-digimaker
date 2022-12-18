@@ -227,8 +227,8 @@ function BlockCarousel(props: ToolRenderProps) {
 
 export const toolCarousel: ToolDefinition = {
   type: "carousel",
+  name: "Carousel",
   menu: {
-    text: "Carousel",
     category: "content",
     icon: <CollectionsOutlined />,
   },

@@ -90,8 +90,8 @@ const Gallery = (props:ToolRenderProps) =>{
 
 export const  toolContentGallery =   { 
     type: "content_gallery",
+    name: "Gallery",
 menu: {
-  text: "Gallery",
   category: "content",
   icon: <CollectionsOutlined />,
 },
