@@ -10,7 +10,7 @@ import { BrowseLink } from '../BrowseLink';
 import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
 import toast from 'react-hot-toast';
 
-export const FullCreate = (props:{id:number, afterAction:any})=>{
+export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string})=>{
   const [data, setData] = useState([] as any);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [validation,setValidation] = useState();
@@ -26,9 +26,11 @@ export const FullCreate = (props:{id:number, afterAction:any})=>{
           dataObject[key] = form.get(key);
       };
       setAnchorEl(null);
-      fetchWithAuth(process.env.REACT_APP_REMOTE_URL +'/content/create/article/' +props.id, {
+      let bodyJson:any={};
+      bodyJson[props.editField]=JSON.stringify(data);
+      fetchWithAuth(`${process.env.REACT_APP_REMOTE_URL}/content/create/${props.contentType}/${props.id}`, {
         method:'POST', 
-        body:JSON.stringify({...dataObject,...{fullbody:JSON.stringify(data)}}) 
+        body:JSON.stringify({...dataObject,...bodyJson}) 
       }).then(data=>{
           if(data.error === false){
               Util.message('Saved')
