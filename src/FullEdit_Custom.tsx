@@ -73,7 +73,7 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
 
 export const CustomProperty = (props:CustomPropertyProps) =>{
   const [blockData, setBlockData] = useState(props.blockData?props.blockData:[{type:'1',value:'cover_image'},{type:'2',value:'summary'}]);
-  const [property,setProperty] = useState(props.data.dm_field?props.data.dm_field:'')
+  const [property,setProperty] = useState(props.data?.dm_field?props.data.dm_field:'')
  
   const changeFontFormat = (v:any,format:any,e?:any)=>{
     setProperty(v)
