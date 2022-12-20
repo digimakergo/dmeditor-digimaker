@@ -1,5 +1,5 @@
-Digimaker CMF Widgets for dmeditor 
-===========
+# Digimaker CMF Widgets for dmeditor 
+
 **Change on basic widgets**
 
 - Support link to digimaker content
