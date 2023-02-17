@@ -85,7 +85,7 @@ function BlockCarousel(props: ToolRenderProps) {
 
   useEffect(() => {
     if( ids.length > 0){
-      FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then(data=>{
+      FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then((data:any)=>{
         setSelectsource(data.data.list);
       });
     }
@@ -245,6 +245,6 @@ export const toolCarousel: ToolDefinition = {
       interval: true,
     },
   }},
-  view: (props:{data:Array<any>})=><BlockCarousel data={props.data} active={false} onChange={()=>{}} />,
+  view: (props:{data:any})=><BlockCarousel data={props.data} active={false} onChange={()=>{}} />,
   render: (props: ToolRenderProps) => <BlockCarousel {...props} />,
 };

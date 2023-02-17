@@ -80,7 +80,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         setHtml(data.data)
         let propsData = props.data;
-        let sourceData:Array<soureDataFixedType>=currentListM.map(item=>{return {id:item.id,contentType:item.metadata.contenttype}})
+        let sourceData:Array<soureDataFixedType>=currentListM.map((item:any)=>{return {id:item.id,contentType:item.metadata.contenttype}})
         props.onChange({...propsData,data:data.data,source:{sourceType:'fixed',sourceData:sourceData}, settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
       });
     }
@@ -329,5 +329,5 @@ initData: ()=>{
   return {type:'content_grid', data:{}, settings:{columns:3, space:5,viewMode:'editor_block'}};
 },
 onServerLoad: serverLoad,
-view: (props:{data:Array<any>})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} />,
+view: (props:{data:any})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <ContentGrid {...props} /> }

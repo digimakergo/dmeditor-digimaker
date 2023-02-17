@@ -42,7 +42,7 @@ const Gallery = (props:ToolRenderProps) =>{
 
     useEffect(()=>{
         if( ids.length > 0){
-            FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then(data=>{
+            FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then((data:any)=>{
               setSelectsource(data.data.list);
             });
         }
@@ -82,7 +82,7 @@ const Gallery = (props:ToolRenderProps) =>{
 
     {Object.keys(selectsource).length===0?<div className="empty-message">Please select images</div>:
     <div className={"dm-columns columns-"+columns}>
-        {selectsource.map(item=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={process.env.REACT_APP_ASSET_URL+'/'+item.image}></img></div>)}
+        {selectsource.map((item:any)=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={process.env.REACT_APP_ASSET_URL+'/'+item.image}></img></div>)}
     </div>
     }
     </div>
@@ -98,5 +98,5 @@ menu: {
 initData: ()=>{
   return {type:'content_gallery', data:[], settings:{contentType:'image', columns:3, space:5}};
 },
-view: (props:{data:Array<any>})=><Gallery data={props.data} active={false} onChange={()=>{}} />,
+view: (props:{data:any})=><Gallery data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <Gallery {...props} /> }

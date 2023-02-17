@@ -122,8 +122,6 @@ const EmbedContent = (props:ToolRenderProps) =>{
 }
 
 const serverLoad = async (data:any)=>{
-  console.log('ids');
-  console.log(data.data);
   let ids = data.data.join(',');
   let resp = await axios.get('http://localhost:9210/api/site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
   let result = {...data, data:resp.data.data};
@@ -141,5 +139,5 @@ initData: ()=>{
   return {type:'content_Embed', data:[], settings:{contentType:'article'}}
 },
 onServerLoad: serverLoad,
-view: (props:{data:Array<any>})=><EmbedContent data={props.data} active={false} onChange={()=>{}} />,
+view: (props:{data:any})=><EmbedContent data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <EmbedContent {...props} /> }
