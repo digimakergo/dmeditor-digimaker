@@ -1,9 +1,10 @@
 //@ts-ignore
 import React,{ useState,useEffect} from "react";
 import RenderFields from 'digimaker-ui/RenderFields';
-import {FetchWithAuth} from 'digimaker-ui/util';
+import {FetchWithAuth,getDefinition} from 'digimaker-ui/util';
 import { Select,MenuItem,FormControl} from "@mui/material";
 import { PropertyItem } from 'dmeditor/utils';
+import {getcustomPropetryConfig} from "./Config"
 
 export interface PrivatePropertyProps {
   id:any, 
@@ -18,6 +19,7 @@ export interface CustomPropertyProps{
   data?:any,
   onChange?:any,
   blockData?:any,
+  contenttype?:string
 }
 
 export const PrivateProperty = (props:PrivatePropertyProps) =>{
@@ -30,9 +32,8 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
     const fetchData = ()=>{
       if(!content){
         let url = '/content/get/'+params
-        console.log('fullEdit_custom',url)
         FetchWithAuth(process.env.REACT_APP_REMOTE_URL + url)
-        .then((data) => {
+        .then((data:any) => {
           setContent(data.data);
           setContenttype(data.data.metadata.contenttype)
         })
@@ -72,7 +73,16 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
 }
 
 export const CustomProperty = (props:CustomPropertyProps) =>{
-  const [blockData, setBlockData] = useState(props.blockData?props.blockData:[{type:'1',value:'cover_image'},{type:'2',value:'summary'}]);
+  const [blockData, setBlockData] = useState(()=>{
+      let arr:any=[];
+      if(props.contenttype){
+        let fields=getDefinition(props.contenttype)?.fields||[];
+        let customProperty=getcustomPropetryConfig(props.data.type)||[];
+        arr= fields.filter((item:any)=>customProperty.length==0?true:customProperty.some((ele:any)=> ele === item.type))
+      }
+      return arr
+    }
+  )
   const [property,setProperty] = useState(props.data?.dm_field?props.data.dm_field:'')
  
   const changeFontFormat = (v:any,format:any,e?:any)=>{
@@ -93,9 +103,9 @@ export const CustomProperty = (props:CustomPropertyProps) =>{
       <MenuItem value="" onMouseUp={(e)=>{e.preventDefault()}}>
         <em>Default</em>
       </MenuItem>
-      {blockData.map((data, index) => (
-        <MenuItem key={index} value={data.value} onMouseUp={(e)=>{e.preventDefault()}}>
-          <span >{data.value}</span>
+      {blockData.map((data:any, index:any) => (
+        <MenuItem key={index} value={data.identifier} onMouseUp={(e)=>{e.preventDefault()}}>
+          <span >{data.identifier}</span>
         </MenuItem>
       ))
       }

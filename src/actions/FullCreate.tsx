@@ -8,7 +8,7 @@ import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
 import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
-import toast from 'react-hot-toast';
+// import toast from 'react-hot-toast';
 
 export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string})=>{
   const [data, setData] = useState([] as any);
@@ -18,20 +18,32 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const formRef = useRef(null);
+  const dataRef:any = useRef(null);
   const save = ()=>{
     if(formRef.current){
       let form=new FormData(formRef.current)
-      const dataObject = {};
+      const dataObject:any = {};
       for (let key of Array.from(form.keys())) {
           dataObject[key] = form.get(key);
       };
       setAnchorEl(null);
       let bodyJson:any={};
       bodyJson[props.editField]=JSON.stringify(data);
+      let newparams:any=JSON.parse(JSON.stringify({...dataObject,...bodyJson}))
+      data.filter((item:any)=>{
+        if(item.dm_field&&item.dm_field!==''){
+          let html:any=document.querySelector(`#${item.id} .dmeditor-block`)?.innerHTML;
+          if(item.dm_field=="coverimage"){
+            html=item.data.url
+          }
+          newparams[item.dm_field]+=html;
+        }
+      })
+
       fetchWithAuth(`${process.env.REACT_APP_REMOTE_URL}/content/create/${props.contentType}/${props.id}`, {
         method:'POST', 
-        body:JSON.stringify({...dataObject,...bodyJson}) 
-      }).then(data=>{
+        body:JSON.stringify(newparams) 
+      }).then((data:any)=>{
           if(data.error === false){
               Util.message('Saved')
               props.afterAction(1);
@@ -39,7 +51,6 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
             Util.error(data.data.message)
             setValidation(data.data.detail)
             setPageTabActiveIndex(1)
-            // window.alert(data.data.detail);
           }
       });
       //Save to server
@@ -51,11 +62,20 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
   const cancel = ()=>{
     props.afterAction(2);
   }
+  useEffect(()=>{
+    dataRef.current={
+      data:data,
+      activeIndex:activeIndex
+    }
+  },[data,activeIndex])
 
   const setProperyFun = (propertyValue:any)=>{
-    let list=[...data]
-    list[activeIndex].dm_field=propertyValue;
-    setData(list);
+    let list=[...dataRef.current.data]
+    list.forEach((item:any)=>{
+      if(item.dm_field==propertyValue)delete item.dm_field
+    })
+    list[dataRef.current.activeIndex].dm_field=propertyValue;
+    setData([...list]);
   }
   return <div>
     <DMEditor
@@ -87,14 +107,13 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
             </MenuItem>        
           </Menu>
       </div>}
-      ids={props.id}
       data={data} 
-      onChangeActive={(activeIndex)=>setActiveIndex(activeIndex)}
-      onChange={(data)=>{setData(data)}}
+      onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}
+      onChange={(data)=>{setData([...data])}}
       imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
-      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data})}
+      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:props.contentType})}
       preBlock={PreBlock}
-      toast={toast}
+      // toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}
       pageTabActiveIndex={pageTabActiveIndex}
     /> 
