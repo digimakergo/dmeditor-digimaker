@@ -36,7 +36,7 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
           if(item.dm_field=="coverimage"){
             html=item.data.url
           }
-          newparams[item.dm_field]+=html;
+          newparams[item.dm_field]=html;
         }
       })
 

@@ -45,7 +45,7 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
         if(item.dm_field=="coverimage"){
           html=item.data.url
         }
-        newparams[item.dm_field]+=html;
+        newparams[item.dm_field]=html;
       }
     })
     setAnchorEl(null);
