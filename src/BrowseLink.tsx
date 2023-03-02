@@ -13,6 +13,7 @@ export interface DialogProps {
   adding?: boolean;
   onConfirm: (val:any,type:any) => void;
   defalutValue?:any
+  hovering:boolean
 }
 
 export const BrowseLink = (props:DialogProps) =>{
@@ -20,6 +21,8 @@ export const BrowseLink = (props:DialogProps) =>{
     const [sourceType, setSourceType] = useState(props.defalutValue?props.defalutValue.source.sourceType:'select');
     const [inputUrl, setInputUrl] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='input'?props.defalutValue.url:'');
     const [currentList, setCurrentList] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='select'?props.defalutValue.source.sourceData:{id:'',content_type:'article'});
+    const [currentFile, setCurrentFile] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='file'?props.defalutValue.source.sourceData:{id:'',content_type:'article'});
+    const [hovering,setHovering] = useState(props.hovering)
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);
       // if(sourceType=='input'){
@@ -29,7 +32,12 @@ export const BrowseLink = (props:DialogProps) =>{
       // }
     };
     const onConfirmSelect= (list:any)=>{
-      setCurrentList(list)
+      if(sourceType === 'select'){
+        setCurrentList(list)
+      }
+      if(sourceType === 'file'){
+        setCurrentFile(list)
+      }
     }
 
     const onConfirm = ()=>{
@@ -39,12 +47,18 @@ export const BrowseLink = (props:DialogProps) =>{
          return  false    
         }
         props.onConfirm(inputUrl,'input')
-      }else{
+      }else if(sourceType=='select'){
         if((currentList.id??'')==''){
-          Util.error('Please select a article  before confirm')
+          Util.error('Please select a article or folder  before confirm')
           return  false    
         }
         props.onConfirm(currentList,'select')
+      }else{
+        if((currentFile.id??'')==''){
+          Util.error('Please select a file  before confirm')
+          return  false    
+        }
+        props.onConfirm(currentFile,'file')
       }
       setAdding(false);
     }
@@ -81,6 +95,7 @@ export const BrowseLink = (props:DialogProps) =>{
               <Tabs value={sourceType} onChange={handleTabChange} aria-label="basic tabs example">
                 <Tab label="Select" value='select' />
                 <Tab label="Input" value='input'/>
+                <Tab label="File" value='file'/>
               </Tabs>
             </Box>
             {sourceType=="input"&&<div className="tab-content" style={{display: 'flex',alignItems: 'center'}}>
@@ -89,6 +104,9 @@ export const BrowseLink = (props:DialogProps) =>{
             </div>}
             {sourceType=="select"&&<div className="tab-content">
               <Browse inline={true} multi={false} trigger={true} selected={currentList.id==''?'':currentList} contenttype={['article',"folder"]} onConfirm={(value:any)=>{onConfirmSelect(value)}} /> 
+            </div>}
+            {sourceType=="file"&&<div className="tab-content">
+              <Browse inline={true} parent={459} multi={false} trigger={true} selected={currentFile.id==''?'':currentFile}  contenttype={['file']} onConfirm={(value:any)=>{onConfirmSelect(value)}} />
             </div>}
           </DialogContent>
           <DialogActions>
