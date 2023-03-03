@@ -12,6 +12,7 @@ import util,{FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState,useRef } from "react";
 import {IconButton,TextField,Select,MenuItem, ToggleButtonGroup,ToggleButton, Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import { serverUtil } from "./ServerUtil";
 
 export interface DialogTitleProps {
   id: string;
@@ -310,7 +311,7 @@ const serverLoad = async (data:any)=>{
         }
         console.log(ids);
         let idStr = ids.join(',');
-        let resp = await axios.get('http://dmdemo2.dev.digimaker.no/api/site/content/view?id='+idStr+'&type=article&viewmode=editor_block&site=dmdemo');
+        let resp = await serverUtil.get('site/content/view?id='+idStr+'&type=article&viewmode=editor_block&site=dmdemo');
         let result = {...data, data:resp.data.data};
         return result;
       }else{

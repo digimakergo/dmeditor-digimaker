@@ -12,6 +12,7 @@ import util,{FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState } from "react";
 import { Button,Dialog,DialogActions,DialogContent,DialogTitle,IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import { serverUtil } from "./ServerUtil";
 
 interface soureDataType {
   id:number;
@@ -123,7 +124,7 @@ const EmbedContent = (props:ToolRenderProps) =>{
 
 const serverLoad = async (data:any)=>{
   let ids = data.data.join(',');
-  let resp = await axios.get('http://localhost:9210/api/site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
+  let resp = await await serverUtil.get('site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
   let result = {...data, data:resp.data.data};
   return result;
 }
