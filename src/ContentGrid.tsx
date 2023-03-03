@@ -304,12 +304,10 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 const serverLoad = async (data:any)=>{
       let sourceData = data.source.sourceData;
       if( sourceData ){
-        console.log('ids');
         let ids:any = [];
         for(let item of sourceData ){
           ids.push(item['id']);
         }
-        console.log(ids);
         let idStr = ids.join(',');
         let resp = await serverUtil.get('site/content/view?id='+idStr+'&type=article&viewmode=editor_block&site=dmdemo');
         let result = {...data, data:resp.data.data};
