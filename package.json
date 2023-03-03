@@ -5,7 +5,7 @@
     "description": "Digimaker widgets for dmeditor",
     "dependencies": {
       "bootstrap": "^5.2.2",
-      "digimaker-ui": "^0.2.0-beta.4",
+      "digimaker-ui": "^0.2.0-beta.5",
       "dmeditor": "^0.1.0-beta.4" 
     },
     "scripts": {

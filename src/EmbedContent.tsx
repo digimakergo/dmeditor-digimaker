@@ -137,8 +137,8 @@ menu: {
   icon: <SquareOutlined />,
 },
 initData: ()=>{
-  return {type:'content_Embed', data:[], settings:{contentType:'article'}}
+  return {type:'content_embed', data:[], settings:{contentType:'article'}}
 },
 onServerLoad: serverLoad,
-view: (props:{data:any})=><EmbedContent data={props.data} active={false} onChange={()=>{}} />,
+view: (props:{data:any})=><EmbedContent data={props.data} active={false} onChange={() => { } } inBlock={false} />,
 render: (props:ToolRenderProps)=> <EmbedContent {...props} /> }
