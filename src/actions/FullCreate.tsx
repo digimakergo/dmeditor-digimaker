@@ -8,13 +8,15 @@ import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
 import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
+import {getFileUrl} from '../Config'
 // import toast from 'react-hot-toast';
 
-export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string})=>{
-  const [data, setData] = useState([] as any);
+export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string,data?:any})=>{
+  const [data, setData] = useState(props.data?props.data:[] as any);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [validation,setValidation] = useState();
   const [pageTabActiveIndex,setPageTabActiveIndex] = useState(0);
+  let contentType=props.contentType?props.contentType:'';
 
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const formRef = useRef(null);
@@ -40,7 +42,7 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
         }
       })
 
-      fetchWithAuth(`${process.env.REACT_APP_REMOTE_URL}/content/create/${props.contentType}/${props.id}`, {
+      fetchWithAuth(`${process.env.REACT_APP_REMOTE_URL}/content/create/${contentType}/${props.id}`, {
         method:'POST', 
         body:JSON.stringify(newparams) 
       }).then((data:any)=>{
@@ -111,11 +113,12 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
       onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}
       onChange={(data)=>{setData([...data])}}
       imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
-      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:props.contentType})}
+      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:contentType})}
       preBlock={PreBlock}
       // toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}
       pageTabActiveIndex={pageTabActiveIndex}
+      fileUrl={(path:any)=>getFileUrl(path)}
     /> 
   </div>
 }

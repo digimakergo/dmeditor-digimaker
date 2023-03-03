@@ -1,4 +1,6 @@
 0.1.0-beta.2
+- 2023-03-02 added: file tab
+- 2023-03-02 added: getFileUrl fun
 - 2023-02-17 updated: customProperty modification and saving
 - 2023-02-17 updated: typescript type
 
