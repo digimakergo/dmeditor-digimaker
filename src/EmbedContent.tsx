@@ -12,6 +12,7 @@ import util,{FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState } from "react";
 import { Button,Dialog,DialogActions,DialogContent,DialogTitle,IconButton } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
+import { serverUtil } from "./ServerUtil";
 
 interface soureDataType {
   id:number;
@@ -123,7 +124,7 @@ const EmbedContent = (props:ToolRenderProps) =>{
 
 const serverLoad = async (data:any)=>{
   let ids = data.data.join(',');
-  let resp = await axios.get('http://localhost:9210/api/site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
+  let resp = await await serverUtil.get('site/content/view?id='+ids+'&type=article&viewmode=editor_block&site=dmdemo');
   let result = {...data, data:resp.data.data};
   return result;
 }
@@ -136,8 +137,8 @@ menu: {
   icon: <SquareOutlined />,
 },
 initData: ()=>{
-  return {type:'content_Embed', data:[], settings:{contentType:'article'}}
+  return {type:'content_embed', data:[], settings:{contentType:'article'}}
 },
 onServerLoad: serverLoad,
-view: (props:{data:any})=><EmbedContent data={props.data} active={false} onChange={()=>{}} />,
+view: (props:{data:any})=><EmbedContent data={props.data} active={false} onChange={() => { } } inBlock={false} />,
 render: (props:ToolRenderProps)=> <EmbedContent {...props} /> }
