@@ -1,14 +1,11 @@
-import { BrowseGalleryOutlined, CollectionsOutlined, Grid4x4Outlined } from "@mui/icons-material";
-
+import { CollectionsOutlined} from "@mui/icons-material";
 import { ToolRenderProps, BlockProperty } from "dmeditor";
 import {PropertyGroup, PropertyItem, Ranger} from 'dmeditor/utils';
-
-import Radio from '@mui/material/Radio';
-
 import {Browse} from 'digimaker-ui';
 import {FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState } from "react";
-import { Button, FormControlLabel, RadioGroup } from "@mui/material";
+import { Button } from "@mui/material";
+import { getFileUrl } from "./Config"
 
 
 const Gallery = (props:ToolRenderProps) =>{
@@ -68,10 +65,6 @@ const Gallery = (props:ToolRenderProps) =>{
                 <Ranger min={1} max={20} defaultValue={space} onChange={v=>{setSpace(v);setIsChange(true)}} />
             </PropertyItem>
             <PropertyItem label='Source'>
-              {/* <RadioGroup value={sourceType} onChange={e=>setSourceType(e.target.value)}>
-                <FormControlLabel value="fixed" control={<Radio size="small" />} label="Fixed" />
-                <FormControlLabel value="dynamic" control={<Radio size="small" />} label="Dynamic" />
-              </RadioGroup> */}
               <Button onClick={handleClickOpen}>Choose</Button>
             </PropertyItem>
         </PropertyGroup>
@@ -82,7 +75,7 @@ const Gallery = (props:ToolRenderProps) =>{
 
     {Object.keys(selectsource).length===0?<div className="empty-message">Please select images</div>:
     <div className={"dm-columns columns-"+columns}>
-        {selectsource.map((item:any)=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={process.env.REACT_APP_ASSET_URL+'/'+item.image}></img></div>)}
+        {selectsource.map((item:any)=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={getFileUrl(item.image)}></img></div>)}
     </div>
     }
     </div>

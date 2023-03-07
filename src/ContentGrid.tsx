@@ -3,9 +3,7 @@ import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings, 
 import { BlockProperty, ToolRenderProps } from "dmeditor";
 import { Ranger, isServer, PropertyGroup, PropertyItem} from "dmeditor/utils";
 import { Util} from "dmeditor/utils/Util";
-// import { Dialog} from "dmeditor/utils/Dialog";
 import axios from 'axios';
-
 import Browse from 'digimaker-ui/Browse';
 
 import util,{FetchWithAuth} from 'digimaker-ui/util'
@@ -38,7 +36,6 @@ interface soureDataDynamicType {
 }
 
 const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
-    // const [ids, setIds] = useState(props.data.data as any);
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
     const [space, setSpace] = useState(props.data.settings.space);    
@@ -302,19 +299,28 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 }
 
 const serverLoad = async (data:any)=>{
-      let sourceData = data.source.sourceData;
-      if( sourceData ){
-        let ids:any = [];
-        for(let item of sourceData ){
-          ids.push(item['id']);
-        }
-        let idStr = ids.join(',');
-        let resp = await serverUtil.get('site/content/view?id='+idStr+'&type=article&viewmode=editor_block&site=dmdemo');
-        let result = {...data, data:resp.data.data};
-        return result;
-      }else{
-        return {};
+  let sourceData = data.source.sourceData;
+  if( sourceData ){
+    let sourceType=data.source.sourceType;
+    let viewmode=data.settings.viewMode||'editor_block';
+    let url='';
+    if(sourceType=='dynamic'){
+      let {parent,number,sortby}=sourceData
+      url=`site/content/view?parent=${parent}&limt=${number}&sortby=${sortby}&type=article&viewmode=${viewmode}&site=dmdemo`
+    }else{
+      let ids:any = [];
+      for(let item of sourceData ){
+        ids.push(item['id']);
       }
+      let idStr = ids.join(',');
+      url=`site/content/view?id=${idStr}&type=article&viewmode=${viewmode}&site=dmdemo`
+    }
+    let resp = await serverUtil.get(url);
+    let result = {...data, data:resp.data.data};
+    return result;
+  }else{
+    return {};
+  }
 }
 
 export const toolContentGrid =   { 
@@ -328,5 +334,5 @@ initData: ()=>{
   return {type:'content_grid', data:{}, settings:{columns:3, space:5,viewMode:'editor_block'}};
 },
 onServerLoad: serverLoad,
-view: (props:{data:any})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} />,
+view: (props:{data:any})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} inBlock={false} />,
 render: (props:ToolRenderProps)=> <ContentGrid {...props} /> }
