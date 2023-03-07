@@ -8,6 +8,7 @@ import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
 import { Util } from "dmeditor/utils/Util";
 import React from 'react';
+import {Create} from 'digimaker-ui/actions';
 
 export interface DialogProps {
   adding?: boolean;
@@ -22,7 +23,7 @@ export const BrowseLink = (props:DialogProps) =>{
     const [inputUrl, setInputUrl] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='input'?props.defalutValue.url:'');
     const [currentList, setCurrentList] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='select'?props.defalutValue.source.sourceData:{id:'',content_type:'article'});
     const [currentFile, setCurrentFile] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='file'?props.defalutValue.source.sourceData:{id:'',content_type:'article'});
-    const [hovering,setHovering] = useState(props.hovering)
+    const [fileAdding,setFileAdding] = useState(true)
     const handleTabChange = (event: React.SyntheticEvent, newValue: string) => {
       setSourceType(newValue);
       // if(sourceType=='input'){
@@ -98,15 +99,25 @@ export const BrowseLink = (props:DialogProps) =>{
                 <Tab label="File" value='file'/>
               </Tabs>
             </Box>
-            {sourceType=="input"&&<div className="tab-content" style={{display: 'flex',alignItems: 'center'}}>
+            {sourceType=="input"&&<div className="tab-content" style={{display: 'flex',alignItems: 'center',padding:'10px 0'}}>
               <span style={{marginRight:'10px'}}>InputUrl:</span>
               <TextField sx={{width:'calc(100% - 120px)'}} placeholder='Please enter the url' defaultValue={inputUrl} size="small" hiddenLabel variant="outlined" onChange={(e)=>setInputUrl(e.target.value)} />
             </div>}
-            {sourceType=="select"&&<div className="tab-content">
+            {sourceType=="select"&&<div className="tab-content" style={{padding:'10px 0'}}>
               <Browse inline={true} multi={false} trigger={true} selected={currentList.id==''?'':currentList} contenttype={['article',"folder"]} onConfirm={(value:any)=>{onConfirmSelect(value)}} /> 
             </div>}
-            {sourceType=="file"&&<div className="tab-content">
+            {sourceType=="file"&&fileAdding&&<div className="tab-content" style={{padding:'10px 0'}}>
               <Browse inline={true} parent={459} multi={false} trigger={true} selected={currentFile.id==''?'':currentFile}  contenttype={['file']} onConfirm={(value:any)=>{onConfirmSelect(value)}} />
+              <Create parent={459} 
+                      contenttype={'file'} 
+                      afterAction={()=>{ 
+                        setFileAdding(false);
+                        setTimeout(()=>{
+                          setFileAdding(true);
+                        },500)
+                      }} 
+              />
+             
             </div>}
           </DialogContent>
           <DialogActions>
