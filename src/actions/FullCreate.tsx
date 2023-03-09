@@ -8,7 +8,7 @@ import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
 import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
-import {getFileUrl} from '../Config'
+import {getFileUrl,getImageUrl} from '../Config'
 // import toast from 'react-hot-toast';
 
 export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string,data?:any})=>{
@@ -118,7 +118,8 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
       // toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}
       pageTabActiveIndex={pageTabActiveIndex}
-      fileUrl={(path:any)=>getFileUrl(path)}
+      fileUrl={getFileUrl}
+      imageUrl={getImageUrl}
     /> 
   </div>
 }
