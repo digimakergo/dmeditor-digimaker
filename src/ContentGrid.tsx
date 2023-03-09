@@ -62,8 +62,6 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     const handleClickOpen = () => {
       setAdding(true);
-      setAdding(false);
-      setTimeout(()=>{setAdding(true);},10)
     };
   
     const handleClose = (event?:any, reason?:any) => {
