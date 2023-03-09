@@ -1,5 +1,5 @@
 0.1.0-beta.5
-
+- 2023-03-02 added:imageUrl property for dmeditor
 
 0.1.0-beta.3
 - 2023-03-02 added: file tab
