@@ -26,16 +26,23 @@ interface soureDataType {
 interface soureDataFixedType {
   id:number;
   contentType:string;
+  title:string;
+  location:any;
+  metadata:any;
 }
 
 interface soureDataDynamicType {
   parent:number;
   contentType:string;
+  title:string;
+  location:any;
+  metadata:any;
   number:number;
   sortby:string[];
 }
 
 const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
+    const [source,setSource] = useState(props.data.source)
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
     const [space, setSpace] = useState(props.data.settings.space);    
@@ -63,7 +70,6 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       if (reason && reason === "backdropClick") 
       return;
       setAdding(false);
-      // props.onCancel();
       if(selectSourceType=='fixed'){
         setSourceType('fixed')
       }else{
@@ -72,26 +78,30 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     };
 
 
-    const fetchHtmlFixed = (idArray:any,mode?:string)=>{
+    const fetchHtmlFixed = ({idArray,mode,isInit}:any)=>{
       let newViewMode=mode?mode:viewMode
       FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${idArray.join(',')}&type=article&viewmode=${newViewMode}&site=dmdemo`)
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         setHtml(data.data)
         let propsData = props.data;
-        let sourceData:Array<soureDataFixedType>=currentListM.map((item:any)=>{return {id:item.id,contentType:item.metadata.contenttype}})
-        props.onChange({...propsData,data:data.data,source:{sourceType:'fixed',sourceData:sourceData}, settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
+        if(!isInit){
+          let sourceData:Array<soureDataFixedType>=currentListM.map((item:any)=>{return {id:item.id,contentType:item.metadata.contenttype,title:item.title,location:item.location,metadata:item.metadata}})
+          props.onChange({...propsData,data:data.data,source:{sourceType:'fixed',sourceData:sourceData}, settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
+        }
       });
     }
 
-    const fetchHtmlDynamic = (parent:any,mode?:string)=>{
+    const fetchHtmlDynamic = ({parent,mode,isInit}:any)=>{
       let newViewMode=mode?mode:viewMode
       FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?parent=${parent}&limt=${limit}&sortby=${sortby}&type=article&viewmode=${newViewMode}&site=dmdemo`)
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         setHtml(data.data)
         let propsData = props.data;
-        let sourceData:soureDataDynamicType={parent:parent,contentType:currentList.metadata.contenttype,number:limit,sortby:sortby}
-        props.onChange({...propsData, data:data.data,source:{sourceType:'dynamic',sourceData:sourceData},settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
-       });
+        if(!isInit){
+          let sourceData:soureDataDynamicType={parent:parent,contentType:currentList.metadata.contenttype,title:currentList.title,location:currentList.location,metadata:currentList.metadata,number:limit,sortby:sortby}
+          props.onChange({...propsData, data:data.data,source:{sourceType:'dynamic',sourceData:sourceData},settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
+        }
+      });
     }
 
     const onConfirmSelect= (list:any,type:string)=>{
@@ -119,11 +129,11 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
         Util.error('Please select a file  before confirm')
        return  false    
       }
-      let idsArray:Array<any> = [];
+      let idArray:Array<any> = [];
       for(var item of currentListM){
-        idsArray.push(item.id);
+        idArray.push(item.id);
       }
-      fetchHtmlFixed(idsArray)
+      fetchHtmlFixed({idArray})
       setAdding(false);
     }
 
@@ -132,7 +142,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
         Util.error('Please select a file  before confirm')
         return;
       }
-      fetchHtmlDynamic(currentList.location.id)
+      fetchHtmlDynamic({parent:currentList.location.id})
       setAdding(false);
     }
  
@@ -140,14 +150,14 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       setViewMode(e.target.value);
       if(sourceType=='fixed'){
         if(currentListM.length==0)return;
-        let idsArray:Array<any> = [];
+        let idArray:Array<any> = [];
         for(var item of currentListM){
-          idsArray.push(item.id);
+          idArray.push(item.id);
         }
-        fetchHtmlFixed(idsArray,e.target.value)
+        fetchHtmlFixed({idArray,mode:e.target.value})
       }else{
         if(Object.keys(currentList).length===0)return;
-        fetchHtmlDynamic(currentList.location.id,e.target.value)
+        fetchHtmlDynamic({parent:currentList.location.id,mode:e.target.value})
       }
     }
 
@@ -169,6 +179,25 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       }
     },[isChange])
     
+    useEffect(()=>{
+      if(!props.view){
+        if(source){
+          if(source.sourceType==='fixed'){
+            let idArray:Array<any> = [];
+            for(var item of source.sourceData){
+              idArray.push(item.id);
+            }
+            setCurrentListM(source.sourceData)
+            fetchHtmlFixed({idArray,isInit:true})
+          }else{
+            setCurrentList(source.sourceData)
+            fetchHtmlDynamic({parent:source.sourceData.parent,isInit:true})
+          }
+          setSourceType(source.sourceType)
+          setSelectSourceType(source.sourceType)
+        }
+      }
+    },[])
 
     if(isServer()){
         return <div className={"dm-columns columns-"+props.data.settings.columns}>        

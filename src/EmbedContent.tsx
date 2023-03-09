@@ -20,6 +20,7 @@ interface soureDataType {
 }
 
 const EmbedContent = (props:ToolRenderProps) =>{
+  const [source,setSource] = useState(props.data.source)
   const [currentSource, setCurrentSource] = useState({} as any);
   const [columns, setColumns] = useState(1);
   const [adding, setAdding] = useState(props.adding);
@@ -47,19 +48,29 @@ const EmbedContent = (props:ToolRenderProps) =>{
       Util.error('Please select a file  before confirm')
      return  false    
     }
-    fetchHtml(currentSource.id);
+    fetchHtml({id:currentSource.id,contentType:currentSource.metadata.contenttype});
     setAdding(false);
   }
 
-  const fetchHtml = (id:any)=>{
-    FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${id}&type=${currentSource.metadata.contenttype}&viewmode=editor_embed&site=dmdemo`)
-    .then((data: { data: { [x: string]: any; }; settings: any; })=>{
-      setHtml(data.data)
-      let propsData = props.data;
-      let sourceData:soureDataType={id:id,contentType:currentSource.metadata.contenttype}
-      props.onChange({...propsData, data: data.data,source:sourceData});
-    });
+  const fetchHtml = ({id,contentType,isInit}:any)=>{
+      FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${id}&type=${contentType}&viewmode=editor_embed&site=dmdemo`)
+      .then((data: { data: { [x: string]: any; }; settings: any; })=>{
+        setHtml(data.data)
+        let propsData = props.data;
+        if(!isInit){
+          let sourceData:soureDataType={id:id,contentType:contentType}
+          props.onChange({...propsData, data: data.data,source:sourceData});
+        }
+      });
   }
+
+  useEffect(()=>{
+    if(!props.view){
+      if(source){
+        fetchHtml({id:source.id,contentType:source.contentType,isInit:true})
+      }
+    }
+  },[])
   
 
   if(isServer()){
