@@ -5,7 +5,7 @@ import {Browse} from 'digimaker-ui';
 import {FetchWithAuth} from 'digimaker-ui/util'
 import { useEffect, useState } from "react";
 import { Button } from "@mui/material";
-import { getFileUrl } from "./Config"
+import { getImageUrl } from "./Config"
 
 
 const Gallery = (props:ToolRenderProps) =>{
@@ -35,6 +35,10 @@ const Gallery = (props:ToolRenderProps) =>{
         setAdding(false);
         let data = props.data;
         props.onChange({...data, data: imgs,source:{contentType:"image",contentId:ids}});
+    }
+    const showTrueImage = (image:any)=>{
+      let  w:any=window.open('about:blank')
+      w.location.href=getImageUrl(image)
     }
 
     useEffect(()=>{
@@ -75,7 +79,7 @@ const Gallery = (props:ToolRenderProps) =>{
 
     {Object.keys(selectsource).length===0?<div className="empty-message">Please select images</div>:
     <div className={"dm-columns columns-"+columns}>
-        {selectsource.map((item:any)=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img src={getFileUrl(item.image)}></img></div>)}
+        {selectsource.map((item:any)=><div style={{display:'inline-block', paddingLeft:space, paddingTop: space}} className='gallery-image'><img onClick={()=>{showTrueImage(item.image)}} src={getImageUrl(item.image,true)}></img></div>)}
     </div>
     }
     </div>

@@ -8,7 +8,7 @@ import { PropertyGroup, PropertyItem } from "dmeditor/utils/Property";
 import { Ranger } from "dmeditor/utils/Ranger";
 import util, { FetchWithAuth } from "digimaker-ui/util";
 import Browse from "digimaker-ui/Browse";
-import { getFileUrl } from "./Config"
+import { getImageUrl } from "./Config"
 
 const IOSSwitch = styled((props: SwitchProps) => <Switch {...props}></Switch>)(
   ({ theme }) => ({
@@ -214,7 +214,7 @@ function BlockCarousel(props: ToolRenderProps) {
             <CarouselItem key={index}>
               <img
                 className="d-block w-100"
-                src={getFileUrl(item.image)}
+                src={getImageUrl(item.image)}
                 alt={`First slide ${index}`}
                 style={{ height: height }}
               />
@@ -246,6 +246,6 @@ export const toolCarousel: ToolDefinition = {
       interval: true,
     },
   }},
-  view: (props:{data:any})=><BlockCarousel data={props.data} active={false} onChange={()=>{}} inBlock={false} />,
+  view: (props:{data:any})=><BlockCarousel data={props.data} active={false} onChange={()=>{}} />,
   render: (props: ToolRenderProps) => <BlockCarousel {...props} />,
 };
