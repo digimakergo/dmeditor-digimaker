@@ -216,7 +216,7 @@ function BlockCarousel(props: ToolRenderProps) {
                 className="d-block w-100"
                 src={getImageUrl(item.image)}
                 alt={`First slide ${index}`}
-                style={{ height: height }}
+                style={{ height: height, objectFit:'contain'}}
               />
             </CarouselItem>
           );
