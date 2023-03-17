@@ -1,4 +1,5 @@
 0.1.0-beta.5
+- 2023-03-13 updated: the picture stretching problem
 - 2023-03-09 fixed: contentgrid/embed_content doesn't load instant data
 - 2023-03-09 added:imageUrl property for dmeditor
 
