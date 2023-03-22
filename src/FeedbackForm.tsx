@@ -22,25 +22,28 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
         const form = event.currentTarget;
         event.preventDefault();
 
-        if (form.checkValidity() === false) {
+        const valid = form.checkValidity();
+        if ( valid === false) {
           event.stopPropagation();
         }
     
         setValidated(true);
 
-        const formData = new FormData(event.target),
-        formDataObj = Object.fromEntries(formData.entries())
-        
-        fetch('/api/form/feedback', {
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            method: "POST",
-            body: JSON.stringify(formDataObj)
-        }).then(res=>res.text()).then(data=>{
-            setResult(data);
-        });
+        if( valid ){
+            const formData = new FormData(event.target),
+            formDataObj = Object.fromEntries(formData.entries())
+            
+            fetch('/api/form/feedback', {
+                headers: {
+                  'Accept': 'application/json',
+                  'Content-Type': 'application/json'
+                },
+                method: "POST",
+                body: JSON.stringify(formDataObj)
+            }).then(res=>res.text()).then(data=>{
+                setResult(data);
+            });
+        }
       };
     
 
@@ -96,7 +99,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
 }
 
 
-export const toolFeedbackFrom: ToolDefinition = {
+export const toolFeedbackForm: ToolDefinition = {
     type: 'dm_feedback_form',
     isComposited: true,
     name:"Feedback form",
