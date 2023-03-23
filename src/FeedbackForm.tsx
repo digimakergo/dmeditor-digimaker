@@ -62,7 +62,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
 
         <Form.Group className="mb-3">
             <Form.Label>Company:</Form.Label>
-            <Form.Control  name="company" type="text" placeholder="Enter your company" />           
+            <Form.Control  name="company" type="text" placeholder="Your company (optional)" />           
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -75,7 +75,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
 
         <Form.Group className="mb-3">
             <Form.Label>Phone:</Form.Label>
-            <Form.Control  name="phone" type="text" placeholder="Phone" />            
+            <Form.Control name="phone" type="text" placeholder="Your phone number (optional)" />            
         </Form.Group>
 
         <Form.Group className="mb-3">
