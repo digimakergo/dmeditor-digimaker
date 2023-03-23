@@ -63,6 +63,9 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
         <Form.Group className="mb-3">
             <Form.Label>Company</Form.Label>
             <Form.Control  name="company" type="text" placeholder="Enter your company" />
+            <Form.Text className="text-muted">
+             Optional
+            </Form.Text>
         </Form.Group>
 
         <Form.Group className="mb-3">
@@ -76,11 +79,14 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
         <Form.Group className="mb-3">
             <Form.Label>Phone</Form.Label>
             <Form.Control  name="phone" type="text" placeholder="Phone" />
+            <Form.Text className="text-muted">
+             Optional
+            </Form.Text>
         </Form.Group>
 
         <Form.Group className="mb-3">
             <Form.Label>Message</Form.Label>
-            <Form.Control  name="message" required as="textarea" rows={3} placeholder="How can we help you request" />
+            <Form.Control  name="message" required as="textarea" rows={3} placeholder="How can we help you?" />
             <Form.Control.Feedback type="invalid">
               Please input message.
             </Form.Control.Feedback>
