@@ -53,7 +53,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
             </BlockProperty>}
         <Form noValidate validated={validated} onSubmit={handleSubmit}>
         <Form.Group className="mb-3" controlId="formBasicEmail">
-            <Form.Label>Name</Form.Label>
+            <Form.Label>Name:</Form.Label>
             <Form.Control name="name" required type="text" placeholder="Enter name" />
             <Form.Control.Feedback type="invalid">
               Please input name.
@@ -61,15 +61,12 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
         </Form.Group>
 
         <Form.Group className="mb-3">
-            <Form.Label>Company</Form.Label>
-            <Form.Control  name="company" type="text" placeholder="Enter your company" />
-            <Form.Text className="text-muted">
-             Optional
-            </Form.Text>
+            <Form.Label>Company:</Form.Label>
+            <Form.Control  name="company" type="text" placeholder="Enter your company" />           
         </Form.Group>
 
         <Form.Group className="mb-3">
-            <Form.Label>Email</Form.Label>
+            <Form.Label>Email:</Form.Label>
             <Form.Control  name="email" required type="email" placeholder="Enter your email" />            
             <Form.Control.Feedback type="invalid">
               Please input valid email.
@@ -77,15 +74,12 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
         </Form.Group>
 
         <Form.Group className="mb-3">
-            <Form.Label>Phone</Form.Label>
-            <Form.Control  name="phone" type="text" placeholder="Phone" />
-            <Form.Text className="text-muted">
-             Optional
-            </Form.Text>
+            <Form.Label>Phone:</Form.Label>
+            <Form.Control  name="phone" type="text" placeholder="Phone" />            
         </Form.Group>
 
         <Form.Group className="mb-3">
-            <Form.Label>Message</Form.Label>
+            <Form.Label>Message:</Form.Label>
             <Form.Control  name="message" required as="textarea" rows={3} placeholder="How can we help you?" />
             <Form.Control.Feedback type="invalid">
               Please input message.
