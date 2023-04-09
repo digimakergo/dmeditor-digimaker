@@ -199,7 +199,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     if(isServer()){
         return <div className={"dm-columns columns-"+props.data.settings.columns}>        
-            {Object.keys(props.data.data).map(index=><div style={{paddingLeft:space, paddingTop: space}}>
+            {Object.keys(props.data.data).map(index=><div key={index} style={{paddingLeft:space, paddingTop: space}}>
               <div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />
               </div>)}
           </div>;
@@ -316,7 +316,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     {Object.keys(html).length===0?<div className="empty-message">Please select Content</div>
     :<div className={"dm-columns columns-"+columns}>
         {Object.keys(html).map(id=>
-          <div style={{paddingLeft:space, paddingTop: space}}>
+          <div key={id} style={{paddingLeft:space, paddingTop: space}}>
             <div dangerouslySetInnerHTML={{__html: (html?html[id]:'') }} />
           </div>
         )}
