@@ -1,12 +1,12 @@
 {
     "name": "dmeditor-digimaker",
-    "version": "0.1.0-beta.5",
+    "version": "0.1.0-beta.6",
     "keywords":["dmeditor","digimaker"],
     "description": "Digimaker widgets for dmeditor",
     "dependencies": {
       "bootstrap": "^5.2.2",
       "digimaker-ui": "^0.2.1-beta.1",
-      "dmeditor": "^0.1.0-beta.7" 
+      "dmeditor": "^0.1.0-beta.8" 
     },
     "scripts": {
       "dist": "rm -rf dist/* && cp -r ./package.json README.md ./dist && tsc",
