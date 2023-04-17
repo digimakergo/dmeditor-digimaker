@@ -13,6 +13,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
     const [validated, setValidated] = useState(false);
 
     const [result, setResult] = useState('');
+    const [sending, setSending] = useState(false);
 
     useEffect(()=>{
         props.onChange({...props.data,common: commonSettings });
@@ -32,7 +33,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
         if( valid ){
             const formData = new FormData(event.target),
             formDataObj = Object.fromEntries(formData.entries())
-            
+            setSending(true);
             fetch('/api/form/feedback', {
                 headers: {
                   'Accept': 'application/json',
@@ -41,6 +42,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
                 method: "POST",
                 body: JSON.stringify(formDataObj)
             }).then(res=>res.text()).then(data=>{
+                setSending(false);
                 setResult(data);
             });
         }
@@ -86,7 +88,7 @@ const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
             </Form.Control.Feedback>
         </Form.Group>
 
-        <Button variant="primary" type="submit">
+        <Button variant="primary" disabled={sending} type="submit">
             Submit
         </Button> <br /> <br />
 
