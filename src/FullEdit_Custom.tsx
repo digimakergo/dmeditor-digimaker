@@ -55,7 +55,7 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
             </div>
     }else{
       if( !content ){
-       return null
+       return <></>
       }else{
         return <div>
             <form  ref={props.ref} >

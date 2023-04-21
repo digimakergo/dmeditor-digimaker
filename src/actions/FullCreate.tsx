@@ -112,14 +112,14 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
       data={data} 
       onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}
       onChange={(data)=>{setData([...data])}}
-      imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
+      browseImage={BrowseImage} browseLink={BrowseLink} 
       customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:contentType})}
       preBlock={PreBlock}
       // toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}
       pageTabActiveIndex={pageTabActiveIndex}
-      fileUrl={getFileUrl}
-      imageUrl={getImageUrl}
+      getFileUrl={getFileUrl}
+      getImageUrl={getImageUrl}
     /> 
   </div>
 }

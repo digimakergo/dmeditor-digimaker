@@ -8,15 +8,10 @@ import {IconButton,TextField, Button, Dialog,DialogActions,DialogContent,DialogT
 import CloseIcon from '@mui/icons-material/Close';
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Util } from "dmeditor/utils/Util";
+import { Util, BrowseProps } from "dmeditor/utils/Util";
 import React from 'react';
 
-export interface DialogProps {
-  adding?: boolean;
-  onConfirm: (val:any,type:any) => void;
-}
-
-export const BrowseImage = (props:DialogProps) =>{
+export const BrowseImage = (props:BrowseProps) =>{
     const [adding, setAdding] = useState(props.adding?true:false);
     const [sourceType, setSourceType] = useState('select');
     const [inputUrl, setInputUrl] = useState('');

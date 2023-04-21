@@ -6,18 +6,11 @@ import {IconButton,TextField,Button, Dialog,DialogActions,DialogContent,DialogTi
 import CloseIcon from '@mui/icons-material/Close';
 import imageExtensions from 'image-extensions'
 import isUrl from 'is-url'
-import { Util } from "dmeditor/utils/Util";
+import { BrowseProps, Util } from "dmeditor/utils/Util";
 import React from 'react';
 import {Create} from 'digimaker-ui/actions';
 
-export interface DialogProps {
-  adding?: boolean;
-  onConfirm: (val:any,type:any) => void;
-  defalutValue?:any
-  hovering:boolean
-}
-
-export const BrowseLink = (props:DialogProps) =>{
+export const BrowseLink = (props:BrowseProps) =>{
     const [adding, setAdding] = useState(props.adding?true:false);
     const [sourceType, setSourceType] = useState(props.defalutValue?props.defalutValue.source.sourceType:'select');
     const [inputUrl, setInputUrl] = useState(props.defalutValue&&props.defalutValue.source.sourceType==='input'?props.defalutValue.url:'');

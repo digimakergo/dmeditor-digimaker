@@ -146,14 +146,14 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
       data={data} 
       onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}
       onChange={(data)=>{setData([...data])}}
-      imageBrowse={BrowseImage} linkBrowse={BrowseLink} 
+      browseImage={BrowseImage} browseLink={BrowseLink} 
       customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:contentType})}
       preBlock={PreBlock}
       // toast={toast}
       pageTab={()=> PrivateProperty({id:props.id,ref:formRef,validation:validation,content:content})}
       pageTabActiveIndex={pageTabActiveIndex}
-      fileUrl={getFileUrl}
-      imageUrl={getImageUrl}
+      getFileUrl={getFileUrl}
+      getImageUrl={getImageUrl}
       /> 
       </div>
   </div>
