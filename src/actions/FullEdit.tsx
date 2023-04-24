@@ -6,10 +6,18 @@ import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList, Tooltip } from '@
 import { CloseOutlined, MenuOutlined, InfoOutlined, SendOutlined, SaveOutlined } from '@mui/icons-material';
 import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
+import { css } from '@emotion/css'
 import { BrowseLink } from '../BrowseLink';
 import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
 import {getFileUrl,getImageUrl} from '../Config'
 // import toast from 'react-hot-toast';
+
+export const dmeditorActionCss = css`
+position: absolute;
+right: 0px;
+padding: 5px;
+z-index: 100;
+`;
 
 export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
   const [content, setContent] = useState<any>(null);
@@ -106,14 +114,13 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
   }
   return <div>
       <div>
+      <div className={dmeditorActionCss}>
+      <Button onClick={save} size='sm' variant='success'>
+            <SendOutlined /> Save
+        </Button></div>
       <DMEditor
       menu={<div><Button onClick={(e)=>setAnchorEl(e.currentTarget)} size='sm' variant='outlink-info'>
           <MenuOutlined />
-        </Button>
-        <Button onClick={save} size='sm' variant='outlink-info'>
-            <Tooltip title={'Send'}>
-            <SendOutlined />
-            </Tooltip>
         </Button>
         <Menu
           id="basic-menu"

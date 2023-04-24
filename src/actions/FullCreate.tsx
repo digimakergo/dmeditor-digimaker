@@ -9,6 +9,7 @@ import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
 import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
 import {getFileUrl,getImageUrl} from '../Config'
+import { dmeditorActionCss } from './FullEdit';
 // import toast from 'react-hot-toast';
 
 export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string,data?:any})=>{
@@ -82,14 +83,13 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
   return <div>
     <DMEditor
       menu={<div>
+          <div className={dmeditorActionCss}>
+          <Button onClick={save} size='sm' variant='success'>
+            <SendOutlined /> Save
+        </Button></div>
           <Button onClick={(e)=>setAnchorEl(e.currentTarget)} size='sm' variant='outlink-info'>
             <MenuOutlined />
-          </Button>
-          <Button onClick={save} size='sm' variant='outlink-info'>
-            <Tooltip title={'Send'}>
-            <SendOutlined />
-            </Tooltip>
-          </Button>
+          </Button>          
           <Menu
             id="basic-menu"
             anchorEl={anchorEl}
