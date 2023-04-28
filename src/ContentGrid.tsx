@@ -2,7 +2,7 @@ import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings, 
 
 import { BlockProperty, ToolRenderProps } from "dmeditor";
 import { Ranger, isServer, PropertyGroup, PropertyItem} from "dmeditor/utils";
-import { Util} from "dmeditor/utils/Util";
+import { Util, useGetDevice} from "dmeditor/utils";
 import axios from 'axios';
 import Browse from 'digimaker-ui/Browse';
 
@@ -197,8 +197,17 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       }
     },[])
 
+    const isMobile = useGetDevice() === 'mobile';
+
+    const getRenderColumns = ()=>{
+      if(isMobile && columns >2){
+          return 2;
+      }
+      return columns;
+    }
+
     if(isServer()){
-        return <div className={"dm-columns columns-"+props.data.settings.columns}>        
+        return <div className={"dm-columns columns-"+getRenderColumns()}>        
             {Object.keys(props.data.data).map(index=><div key={index} style={{paddingLeft:space, paddingTop: space}}>
               <div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />
               </div>)}
@@ -314,7 +323,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       </Dialog>}
       
     {Object.keys(html).length===0?<div className="empty-message">Please select Content</div>
-    :<div className={"dm-columns columns-"+columns}>
+    :<div className={"dm-columns columns-"+getRenderColumns()}>
         {Object.keys(html).map(id=>
           <div key={id} style={{paddingLeft:space, paddingTop: space}}>
             <div dangerouslySetInnerHTML={{__html: (html?html[id]:'') }} />

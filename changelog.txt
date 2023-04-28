@@ -1,4 +1,5 @@
 0.1.0-beta.6
+- 2023-04-28 updated: ContentGrid renders 2 columns in mobile if it's more
 - 2023-04-24 fixed button text should be white
 - 2023-04-24 updated: put saving button to upper right
 - 2023-04-21 updated: upgraded to dmeditor more formal api
