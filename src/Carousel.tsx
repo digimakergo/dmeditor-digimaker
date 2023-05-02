@@ -86,7 +86,7 @@ function BlockCarousel(props: ToolRenderProps) {
 
   useEffect(() => {
     if( ids.length > 0){
-      FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then((data:any)=>{
+      FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?parent=461&cid='+ids.join(',')).then((data:any)=>{
         setSelectsource(data.data.list);
       });
     }

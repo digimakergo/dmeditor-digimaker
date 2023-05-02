@@ -43,7 +43,7 @@ const Gallery = (props:ToolRenderProps) =>{
 
     useEffect(()=>{
         if( ids.length > 0){
-            FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?cid='+ids.join(',')).then((data:any)=>{
+            FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?parent=461&cid='+ids.join(',')).then((data:any)=>{
               setSelectsource(data.data.list);
             });
         }
@@ -60,7 +60,7 @@ const Gallery = (props:ToolRenderProps) =>{
     },[isChange])
 
     return <div>
-    {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="gallery">
+    {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="content_gallery">
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
                 <Ranger min={1} max={6} defaultValue={columns} onChange={v=>{setColumns(v);setIsChange(true)}} />
