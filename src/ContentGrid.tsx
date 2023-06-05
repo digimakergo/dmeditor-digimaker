@@ -1,6 +1,6 @@
 import { GridViewOutlined, ArrowUpwardOutlined,ArrowDownwardOutlined, Settings, SwapCallsRounded} from "@mui/icons-material";
 
-import { BlockProperty, ToolRenderProps } from "dmeditor";
+import { BlockProperty, ToolRenderProps, getStyleCss } from "dmeditor";
 import { Ranger, isServer, PropertyGroup, PropertyItem} from "dmeditor/utils";
 import { Util, useGetDevice} from "dmeditor/utils";
 import axios from 'axios';
@@ -11,6 +11,7 @@ import { useEffect, useState,useRef } from "react";
 import {IconButton,TextField,Select,MenuItem, ToggleButtonGroup,ToggleButton, Button, Dialog,DialogActions,DialogContent,DialogTitle,Tabs ,Tab , Box } from "@mui/material";
 import CloseIcon from '@mui/icons-material/Close';
 import { serverUtil } from "./ServerUtil";
+import {TemplateSettings} from 'dmeditor/templates/TemplateSettings';
 
 export interface DialogTitleProps {
   id: string;
@@ -51,6 +52,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
     const [isChange,setIsChange] = useState(false);
     const [adding, setAdding] = useState(props.adding);
     const [html, setHtml] = useState(props.data.data as any);
+    const [template, setTemplate] = useState(props.data.template||'');
 
     const [limit, setLimit] = useState(10);
     const [sortby, setSortby] = useState(["priority desc", "published desc"]);
@@ -171,7 +173,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     useEffect(()=>{
       if(isChange){
-          let propsData = props.data;
+          let propsData = {...props.data, template: template};
           props.onChange({...propsData, settings:{...propsData.settings, columns: columns,space:space,viewMode:viewMode}});
           setIsChange(false)
       }
@@ -214,7 +216,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
           </div>;
     }
 
-    return <div>
+    return <div className={getStyleCss('content_grid', template)}>
     {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="content_grid">
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
@@ -240,6 +242,9 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
                 <div><Button onClick={handleClickOpen}>Choose</Button></div>
             </PropertyItem>
         </PropertyGroup>
+
+        <TemplateSettings template={props.data.template||''} blocktype='content_grid' onChange={(identifier:any)=>{setTemplate(identifier); setIsChange(true)}} />
+           
     </BlockProperty>}
     {adding&& <Dialog 
         fullWidth={true}
