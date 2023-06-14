@@ -77,15 +77,17 @@ function BlockCarousel(props: ToolRenderProps) {
   const [ids, setIds] = useState<any[]>(() => {
     return props.blockdata.source?.contentId||[]
   });
-  const [selectsource, setSelectsource] = useState<any[]>(() => {
-    return props.blockdata.data;
-  });
+  const [selectsource, setSelectsource] = useState<any[]>(props.blockdata.data);
   const [isChange,setIsChange] = useState(false);
 
   useEffect(() => {
     if( ids.length > 0){
       FetchWithAuth(process.env.REACT_APP_REMOTE_URL+'/content/list/image?parent=461&cid='+ids.join(',')).then((data:any)=>{
-        setSelectsource(data.data.list);
+        let list:any = [];
+        data.data.list.map((item:any)=>{
+          list.push(item.image);
+        })
+        setSelectsource(list);
       });
     }
   }, []);
@@ -212,7 +214,7 @@ function BlockCarousel(props: ToolRenderProps) {
             <CarouselItem key={index}>
               <img
                 className="d-block w-100"
-                src={getImageUrl(item.image)}
+                src={getImageUrl(item)}
                 alt={`First slide ${index}`}
                 style={{ height: height, objectFit:'contain'}}
               />
