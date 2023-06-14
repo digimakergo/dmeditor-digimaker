@@ -44,7 +44,7 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
       params={...dataObject,...bodyJson}
       //Save to server
     }else{
-      params={...content,...bodyJson}
+      params=bodyJson
     }
 
     let newparams:any=JSON.parse(JSON.stringify(params))
@@ -90,7 +90,7 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
           Util.error("Wrong format: "+ err)
         }
     });
-  },[props.id]);
+  },[]);
   
 
   useEffect(()=>{

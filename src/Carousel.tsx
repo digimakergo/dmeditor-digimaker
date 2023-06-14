@@ -65,22 +65,20 @@ const IOSSwitch = styled((props: SwitchProps) => <Switch {...props}></Switch>)(
 function BlockCarousel(props: ToolRenderProps) {
   const [adding, setAdding] = useState(props.adding);
   const [indicators, setIndicators] = useState<boolean>(
-    props.data.settings.indicators
+    props.blockdata.settings?.indicators||true
   );
-  const [height, setHeight] = useState<number>(props.data.settings.height);
-  const [fade, setFade] = useState<boolean>(props.data.settings.fade);
+  const [height, setHeight] = useState<number>(props.blockdata.settings?.height||300);
+  const [fade, setFade] = useState<boolean>(props.blockdata.settings?.fade||false);
   const [controls, setControls] = useState<boolean>(
-    props.data.settings.controls
+    props.blockdata.settings?.controls||true
   );
-  const [slide, setSlide] = useState<boolean>(props.data.settings.slide);
-  const [interval, setInterval] = useState(() => {
-    return props.data.settings.interval ? 5000 : null;
-  });
+  const [slide, setSlide] = useState<boolean>(props.blockdata.settings?.slide||true);
+  const [interval, setInterval] = useState((props.blockdata.settings?.interval)?5000:null);
   const [ids, setIds] = useState<any[]>(() => {
-    return props.data.source? props.data.source.contentId:[]
+    return props.blockdata.source?.contentId||[]
   });
   const [selectsource, setSelectsource] = useState<any[]>(() => {
-    return props.data.data;
+    return props.blockdata.data;
   });
   const [isChange,setIsChange] = useState(false);
 
@@ -94,7 +92,7 @@ function BlockCarousel(props: ToolRenderProps) {
 
   useEffect(()=>{
     if(isChange){
-      let propsData = props.data;
+      let propsData = props.blockdata;
       let settings={
         height: height,
         indicators: indicators,
@@ -117,7 +115,7 @@ function BlockCarousel(props: ToolRenderProps) {
       }
       setIds(ids)
       setSelectsource(list);
-    let propsData = props.data;
+    let propsData = props.blockdata;
     props.onChange({...propsData, data: imgs,source:{contentType:"image",contentId:ids}});
   };
   const changeInterval = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -246,6 +244,5 @@ export const toolCarousel: ToolDefinition = {
       interval: true,
     },
   }},
-  view: (props:{data:any})=><BlockCarousel data={props.data} active={false} onChange={()=>{}} />,
   render: (props: ToolRenderProps) => <BlockCarousel {...props} />,
 };

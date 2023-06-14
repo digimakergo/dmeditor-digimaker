@@ -44,16 +44,16 @@ interface soureDataDynamicType {
 }
 
 const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
-    const [source,setSource] = useState(props.data.source)
+    const [source,setSource] = useState(props.blockdata.source)
     const [sourceType, setSourceType] = useState('fixed');
     const [selectSourceType, setSelectSourceType] = useState('fixed');
-    const [space, setSpace] = useState(props.data.settings.space);    
-    const [columns, setColumns] = useState(props.data.settings.columns);
-    const [viewMode,setViewMode] = useState(props.data.settings.viewMode?props.data.settings.viewMode:'editor_block');
+    const [space, setSpace] = useState(props.blockdata.settings?.space);    
+    const [columns, setColumns] = useState(props.blockdata.settings?.columns);
+    const [viewMode,setViewMode] = useState(props.blockdata.settings?.viewMode||'editor_block');
     const [isChange,setIsChange] = useState(false);
     const [adding, setAdding] = useState(props.adding);
-    const [html, setHtml] = useState(props.data.data as any);
-    const [styleIdentifier, setStyleIdentifier] = useState(props.data.style||'');
+    const [html, setHtml] = useState(props.blockdata.data as any);
+    const [styleIdentifier, setStyleIdentifier] = useState(props.blockdata.style||'');
 
     const [limit, setLimit] = useState(10);
     const [sortby, setSortby] = useState(["priority desc", "published desc"]);
@@ -84,7 +84,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${idArray.join(',')}&type=article&viewmode=${newViewMode}&site=dmdemo`)
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         setHtml(data.data)
-        let propsData = props.data;
+        let propsData = props.blockdata;
         if(!isInit){
           let sourceData:Array<soureDataFixedType>=currentListM.map((item:any)=>{return {id:item.id,contentType:item.metadata.contenttype,title:item.title,location:item.location,metadata:item.metadata}})
           props.onChange({...propsData,data:data.data,source:{sourceType:'fixed',sourceData:sourceData}, settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
@@ -97,7 +97,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
       FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?parent=${parent}&limt=${limit}&sortby=${sortby}&type=article&viewmode=${newViewMode}&site=dmdemo`)
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         setHtml(data.data)
-        let propsData = props.data;
+        let propsData = props.blockdata;
         if(!isInit){
           let sourceData:soureDataDynamicType={parent:parent,contentType:currentList.metadata.contenttype,title:currentList.title,location:currentList.location,metadata:currentList.metadata,number:limit,sortby:sortby}
           props.onChange({...propsData, data:data.data,source:{sourceType:'dynamic',sourceData:sourceData},settings:{...propsData.settings, columns: columns,space:space,viewMode:newViewMode}});
@@ -174,7 +174,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     useEffect(()=>{
       if(isChange){
-          let propsData = {...props.data, style: styleIdentifier};
+          let propsData = {...props.blockdata, style: styleIdentifier};
           props.onChange({...propsData, settings:{...propsData.settings, columns: columns,space:space,viewMode:viewMode}});
           setIsChange(false)
       }
@@ -211,13 +211,13 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
 
     if(isServer()){
         return <div className={"dm-columns columns-"+getRenderColumns()}>        
-            {Object.keys(props.data.data).map(index=><div key={index} style={{paddingLeft:space, paddingTop: space}}>
-              <div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />
+            {Object.keys(props.blockdata.data).map(index=><div key={index} style={{paddingLeft:space, paddingTop: space}}>
+              <div dangerouslySetInnerHTML={{ __html:props.blockdata.data[index]}} />
               </div>)}
           </div>;
     }
 
-    return <div className={css`.viewmode-edit & a{pointer-events: none;}`+' '+getStyleCss('content_grid', template)+" dme-content_grid"}>
+    return <div className={css`.viewmode-edit & a{pointer-events: none;}`+' '+getStyleCss('content_grid', styleIdentifier)+" dme-content_grid"}>
     {props.active&&<BlockProperty inBlock={props.inBlock} blocktype="content_grid">
         <PropertyGroup header='Settings'>
             <PropertyItem label='Columns'>
@@ -244,7 +244,7 @@ const ContentGrid = (props: ToolRenderProps &{view?:boolean}) =>{
             </PropertyItem>
         </PropertyGroup>
 
-        <StyleSettings template={props.data.style||''} blocktype='content_grid' onChange={(identifier:any)=>{setStyleIdentifier(identifier); setIsChange(true)}} />
+        <StyleSettings styleIdentifier={props.blockdata.style||''} blocktype='content_grid' onChange={(identifier:any)=>{setStyleIdentifier(identifier); setIsChange(true)}} />
            
     </BlockProperty>}
     {adding&& <Dialog 
@@ -376,5 +376,4 @@ initData: ()=>{
   return {type:'content_grid', data:{}, settings:{columns:3, space:5,viewMode:'editor_block'}};
 },
 onServerLoad: serverLoad,
-view: (props:{data:any})=><ContentGrid view={true} data={props.data} active={false} onChange={()=>{}} inBlock={false} />,
 render: (props:ToolRenderProps)=> <ContentGrid {...props} /> }

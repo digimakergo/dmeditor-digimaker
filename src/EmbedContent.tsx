@@ -20,11 +20,11 @@ interface soureDataType {
 }
 
 const EmbedContent = (props:ToolRenderProps) =>{
-  const [source,setSource] = useState(props.data.source)
+  const [source,setSource] = useState(props.blockdata.source)
   const [currentSource, setCurrentSource] = useState({} as any);
   const [columns, setColumns] = useState(1);
   const [adding, setAdding] = useState(props.adding);
-  const [html, setHtml] = useState(props.data.data as any);
+  const [html, setHtml] = useState(props.blockdata.data as any);
 
   const handleClickOpen = () => {
     setAdding(true);
@@ -56,7 +56,7 @@ const EmbedContent = (props:ToolRenderProps) =>{
       FetchWithAuth(`${process.env.REACT_APP_DMEDITOR_CONTENT_VIEW}/site/content/view?id=${id}&type=${contentType}&viewmode=editor_embed&site=dmdemo`)
       .then((data: { data: { [x: string]: any; }; settings: any; })=>{
         setHtml(data.data)
-        let propsData = props.data;
+        let propsData = props.blockdata;
         if(!isInit){
           let sourceData:soureDataType={id:id,contentType:contentType}
           props.onChange({...propsData, data: data.data,source:sourceData});
@@ -74,9 +74,9 @@ const EmbedContent = (props:ToolRenderProps) =>{
   
 
   if(isServer()){
-    return <div className={"dm-columns columns-"+props.data.settings.columns}>        
-        {Object.keys(props.data.data).map(index=><div style={{display:'inline-block'}} className='Embed-list'>
-          <div dangerouslySetInnerHTML={{ __html:props.data.data[index]}} />
+    return <div className={"dm-columns columns-"+props.blockdata.settings?.columns}>        
+        {Object.keys(props.blockdata.data).map(index=><div style={{display:'inline-block'}} className='Embed-list'>
+          <div dangerouslySetInnerHTML={{ __html:props.blockdata.data[index]}} />
           </div>)}
       </div>;
 }
@@ -151,5 +151,4 @@ initData: ()=>{
   return {type:'content_embed', data:[], settings:{contentType:'article'}}
 },
 onServerLoad: serverLoad,
-view: (props:{data:any})=><EmbedContent data={props.data} active={false} onChange={() => { } } inBlock={false} />,
 render: (props:ToolRenderProps)=> <EmbedContent {...props} /> }

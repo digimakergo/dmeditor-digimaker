@@ -9,14 +9,14 @@ import {CommonSettings} from 'dmeditor/CommonSettings';
 import { Alert, Button, Form } from "react-bootstrap";
 
 const FeedbackForm = (props:ToolRenderProps &{view?:boolean})=>{
-    const [commonSettings, setCommonSettings] = useState(props.data.common);
+    const [commonSettings, setCommonSettings] = useState(props.blockdata.settings?.style||{});
     const [validated, setValidated] = useState(false);
 
     const [result, setResult] = useState('');
     const [sending, setSending] = useState(false);
 
     useEffect(()=>{
-        props.onChange({...props.data,common: commonSettings });
+        props.onChange({...props.blockdata,settings: {style: commonSettings }});
     },[commonSettings]);
 
     const handleSubmit = (event) => {
@@ -109,11 +109,9 @@ export const toolFeedbackForm: ToolDefinition = {
     initData: ()=>{
         return {
         type:'dm_feedback_form',
-        settings:{},
+        settings:{style:{}},
         data:'', 
-        common:{}      
         }
     },
-    view: (props:{data:any})=><FeedbackForm  view={true} data={props.data} active={false} onChange={()=>{}} inBlock={false} />,
     render:FeedbackForm    
 }

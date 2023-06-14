@@ -9,11 +9,11 @@ import { getImageUrl } from "./Config"
 
 
 const Gallery = (props:ToolRenderProps) =>{
-    const [ids, setIds] = useState(props.data.source? props.data.source.contentId:[]);
-    const [space, setSpace] = useState(props.data.settings.space);    
+    const [ids, setIds] = useState(props.blockdata.source?.contentId||[]);
+    const [space, setSpace] = useState(props.blockdata.settings?.space);    
     const [selectsource, setSelectsource] = useState([] as any);
     const [sourceType, setSourceType] = useState('fixed');
-    const [columns, setColumns] = useState(props.data.settings.columns);
+    const [columns, setColumns] = useState(props.blockdata.settings?.columns);
     const [adding, setAdding] = useState(props.adding);
     const [isChange,setIsChange] = useState(false);
 
@@ -33,7 +33,7 @@ const Gallery = (props:ToolRenderProps) =>{
         setIds(ids)
         setSelectsource(list);
         setAdding(false);
-        let data = props.data;
+        let data = props.blockdata;
         props.onChange({...data, data: imgs,source:{contentType:"image",contentId:ids}});
     }
     const showTrueImage = (image:any)=>{
@@ -52,7 +52,7 @@ const Gallery = (props:ToolRenderProps) =>{
     useEffect(()=>{
       if(isChange){
         if(sourceType==='fixed'){
-          let propsData = props.data;
+          let propsData = props.blockdata;
           props.onChange({...propsData, settings:{...propsData.settings, columns: columns,space:space}});
           setIsChange(false)
         }
@@ -95,5 +95,4 @@ menu: {
 initData: ()=>{
   return {type:'content_gallery', data:[], settings:{contentType:'image', columns:3, space:5}};
 },
-view: (props:{data:any})=><Gallery data={props.data} active={false} onChange={()=>{}} />,
 render: (props:ToolRenderProps)=> <Gallery {...props} /> }
