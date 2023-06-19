@@ -6,7 +6,7 @@
     "dependencies": {
       "bootstrap": "^5.2.2",
       "digimaker-ui": "^0.2.1-beta.1",
-      "dmeditor": "^0.1.0-beta.8" 
+      "dmeditor": "^0.1.0-beta.10" 
     },
     "scripts": {
       "dist": "rm -rf dist/* && cp -r ./package.json README.md ./dist && tsc",
