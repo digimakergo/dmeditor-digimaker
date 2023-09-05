@@ -81,12 +81,13 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
     setData([...list]);
   }
   return <div>
-    <DMEditor
-      menu={<div>
-          <div className={dmeditorActionCss}>
+    <div className={dmeditorActionCss}>
           <Button onClick={save} size='sm' variant='success'>
             <SendOutlined /> Save
         </Button></div>
+        
+    <DMEditor
+      menu={<div>          
           <Button onClick={(e)=>setAnchorEl(e.currentTarget)} size='sm' variant='outlink-info'>
             <MenuOutlined />
           </Button>          
