@@ -8,8 +8,9 @@ import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { css } from '@emotion/css'
 import { BrowseLink } from '../BrowseLink';
-import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
+import { CustomProperty,PreBlock,PrivateProperty } from './FullEdit_Custom';
 import {getFileUrl,getImageUrl} from '../Config'
+import { convertDMFieldToInput } from './Common';
 // import toast from 'react-hot-toast';
 
 export const dmeditorActionCss = css`
@@ -47,20 +48,20 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
       params=bodyJson
     }
 
-    let newparams:any=JSON.parse(JSON.stringify(params))
-    data.filter((item:any)=>{
-      if(item.dm_field&&item.dm_field!==''){
-        let html:any=document.querySelector(`#${item.id} .dmeditor-block`)?.innerHTML;
-        if(item.dm_field=="coverimage"){
-          html=item.data.url
-        }
-        newparams[item.dm_field]=html;
+    let mergedData:any=JSON.parse(JSON.stringify(params))
+
+     //update dmeditor data to content field
+     data.map((item:any)=>{     
+      const field = item.dm_field;   
+      if(field){
+        mergedData[field] = convertDMFieldToInput(contentType, field, item, mergedData[field] );          
       }
     })
+   
     setAnchorEl(null);
       fetchWithAuth('content/update/'+props.id, {
         method:'POST', 
-        body:JSON.stringify(newparams) 
+        body:JSON.stringify(mergedData) 
       }).then((data:any)=>{
           if(data.error === false){
               Util.message('Saved')

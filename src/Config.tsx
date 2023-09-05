@@ -3,7 +3,8 @@ import util from "digimaker-ui/util";
 export const getcustomPropetryConfig = (type:any)=>{
   let customPropeyConfig:any={
     "image":["image"], 
-    "text":["richtext"]
+    "text":["richtext"],
+    "heading":["text"]
   }
   return customPropeyConfig[type]
 }

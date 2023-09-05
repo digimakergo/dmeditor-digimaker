@@ -7,9 +7,10 @@ import { CloseOutlined, MenuOutlined, InfoOutlined, SendOutlined, SaveOutlined }
 import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
-import { CustomProperty,PreBlock,PrivateProperty } from '../FullEdit_Custom';
+import { CustomProperty,PreBlock,PrivateProperty } from './FullEdit_Custom';
 import {getFileUrl,getImageUrl} from '../Config'
 import { dmeditorActionCss } from './FullEdit';
+import { convertDMFieldToInput } from './Common';
 // import toast from 'react-hot-toast';
 
 export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string,data?:any})=>{
@@ -24,6 +25,7 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
   const dataRef:any = useRef(null);
   const save = ()=>{
     if(formRef.current){
+      //form data
       let form=new FormData(formRef.current)
       const dataObject:any = {};
       for (let key of Array.from(form.keys())) {
@@ -32,20 +34,20 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
       setAnchorEl(null);
       let bodyJson:any={};
       bodyJson[props.editField]=JSON.stringify(data);
-      let newparams:any=JSON.parse(JSON.stringify({...dataObject,...bodyJson}))
-      data.filter((item:any)=>{
-        if(item.dm_field&&item.dm_field!==''){
-          let html:any=document.querySelector(`#${item.id} .dmeditor-block`)?.innerHTML;
-          if(item.dm_field=="coverimage"){
-            html=item.data.url
-          }
-          newparams[item.dm_field]=html;
+
+      let mergedData:any=JSON.parse(JSON.stringify({...dataObject,...bodyJson}))
+
+      //update dmeditor data to content field
+      data.map((item:any)=>{     
+        const field = item.dm_field;   
+        if(field){
+          mergedData[field] = convertDMFieldToInput(props.contentType, field, item, mergedData[field] );          
         }
       })
 
       fetchWithAuth(`${process.env.REACT_APP_REMOTE_URL}/content/create/${contentType}/${props.id}`, {
         method:'POST', 
-        body:JSON.stringify(newparams) 
+        body:JSON.stringify(mergedData) 
       }).then((data:any)=>{
           if(data.error === false){
               Util.message('Saved')
@@ -85,7 +87,7 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
           <Button onClick={save} size='sm' variant='success'>
             <SendOutlined /> Save
         </Button></div>
-        
+
     <DMEditor
       menu={<div>          
           <Button onClick={(e)=>setAnchorEl(e.currentTarget)} size='sm' variant='outlink-info'>
@@ -117,7 +119,7 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
       customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:contentType})}
       preBlock={PreBlock}
       // toast={toast}
-      pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:''})}
+      pageTab={()=> PrivateProperty({id:props.id,ref:formRef,contenttype:'article',type:'create',validation:validation,content:data})}
       pageTabActiveIndex={pageTabActiveIndex}
       getFileUrl={getFileUrl}
       getImageUrl={getImageUrl}

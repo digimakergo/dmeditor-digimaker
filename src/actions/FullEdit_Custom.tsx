@@ -4,7 +4,8 @@ import RenderFields from 'digimaker-ui/RenderFields';
 import {FetchWithAuth,getDefinition} from 'digimaker-ui/util';
 import { Select,MenuItem,FormControl} from "@mui/material";
 import { PropertyItem } from 'dmeditor/utils';
-import {getcustomPropetryConfig} from "./Config"
+import {getcustomPropetryConfig} from "../Config";
+import { css } from "@emotion/css";
 
 export interface PrivatePropertyProps {
   id:any, 
@@ -50,7 +51,7 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
     if(props.type=='create'){
       return <div>
               <form  ref={props.ref} >
-                <RenderFields mode='edit' type={contenttype} data={''} validation={validation} />
+                <RenderFields mode='edit' type={contenttype} data={content} validation={validation} />
               </form>
             </div>
     }else{
@@ -73,12 +74,12 @@ export const PrivateProperty = (props:PrivatePropertyProps) =>{
 }
 
 export const CustomProperty = (props:CustomPropertyProps) =>{
-  const [blockData, setBlockData] = useState(()=>{
+  const [fieldList, setFieldList] = useState(()=>{
       let arr:any=[];
       if(props.contenttype){
         let fields=getDefinition(props.contenttype)?.fields||[];
         let customProperty=getcustomPropetryConfig(props.data.type)||[];
-        arr= fields.filter((item:any)=>customProperty.length==0?true:customProperty.some((ele:any)=> ele === item.type))
+        arr= fields.filter((item:any)=>customProperty.length==0?false:customProperty.includes(item.type))
       }
       return arr
     }
@@ -91,7 +92,11 @@ export const CustomProperty = (props:CustomPropertyProps) =>{
   }
  
 
-  return <PropertyItem label="property">
+  if( !fieldList ){
+    return <></>
+  }
+
+  return <PropertyItem label="Field">
    <Select
       size="small"
       fullWidth
@@ -101,11 +106,11 @@ export const CustomProperty = (props:CustomPropertyProps) =>{
       inputProps={{ 'aria-label': 'Without label' }}
     >
       <MenuItem value="" onMouseUp={(e)=>{e.preventDefault()}}>
-        <em>Default</em>
+        <em>None</em>
       </MenuItem>
-      {blockData.map((data:any, index:any) => (
-        <MenuItem key={index} value={data.identifier} onMouseUp={(e)=>{e.preventDefault()}}>
-          <span >{data.identifier}</span>
+      {fieldList.map((fieldDef:any, index:any) => (
+        <MenuItem key={index} value={fieldDef.identifier} onMouseUp={(e)=>{e.preventDefault()}}>
+          <span>{fieldDef.name}</span>
         </MenuItem>
       ))
       }
@@ -114,7 +119,15 @@ export const CustomProperty = (props:CustomPropertyProps) =>{
 
 }
 
+const preBlockStyle = css`position: absolute;
+left: -150px;
+text-align: right;
+display: block;
+width: 150px;
+color: #666;
+padding: 5px`;
+
 export const PreBlock = (props:{blockData:any}) =>{
-  return <div>{props.blockData?props.blockData:''}</div>
+  return <div className={preBlockStyle}>{props.blockData?props.blockData:''}</div>
 }
 
