@@ -118,6 +118,7 @@ left: -150px;
 text-align: right;
 display: block;
 width: 150px;
+font-size: 85%;
 color: #666;
 padding: 5px`;
 
