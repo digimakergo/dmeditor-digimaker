@@ -8,9 +8,8 @@ import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { css } from '@emotion/css'
 import { BrowseLink } from '../BrowseLink';
-import { CustomProperty,PreBlock,PrivateProperty } from './FullEdit_Custom';
+import { DMFieldSelect,PreBlock, SettingTab, convertDMFieldToInput } from './Common';
 import {getFileUrl,getImageUrl} from '../Config'
-import { convertDMFieldToInput } from './Common';
 // import toast from 'react-hot-toast';
 
 export const dmeditorActionCss = css`
@@ -155,10 +154,10 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
       onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}
       onChange={(data)=>{setData([...data])}}
       browseImage={BrowseImage} browseLink={BrowseLink} 
-      customProperty={(props:any)=> CustomProperty({onChange:setProperyFun,data:props.data,contenttype:contentType})}
-      preBlock={PreBlock}
+      customProperty={(props:any)=> DMFieldSelect({onChange:setProperyFun,data:props.data,contenttype:contentType})}
+      preBlock={(props:{blockData:any})=><PreBlock blockData={props.blockData} contentType={contentType} />}
       // toast={toast}
-      pageTab={()=> PrivateProperty({id:props.id,ref:formRef,validation:validation,content:content})}
+      pageTab={()=> SettingTab({id:props.id,ref:formRef,validation:validation,content:content})}
       pageTabActiveIndex={pageTabActiveIndex}
       getFileUrl={getFileUrl}
       getImageUrl={getImageUrl}
