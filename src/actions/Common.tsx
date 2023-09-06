@@ -3,7 +3,7 @@ import React,{ useState,useEffect} from "react";
 import RenderFields from 'digimaker-ui/RenderFields';
 import {FetchWithAuth,getDefinition} from 'digimaker-ui/util';
 import { Select,MenuItem,FormControl} from "@mui/material";
-import { PropertyItem } from 'dmeditor/utils';
+import { PropertyGroup, PropertyItem } from 'dmeditor/utils';
 import {getcustomPropetryConfig} from "../Config";
 import { css } from "@emotion/css";
 
@@ -90,26 +90,28 @@ export const DMFieldSelect = (props:DMFieldSelectProps) =>{
     return <></>
   }
 
-  return <PropertyItem label="Field">
-   <Select
-      size="small"
-      fullWidth
-      value={property}
-      onChange={(e)=>{changeFontFormat(e.target.value,'fontFamily')}}
-      displayEmpty
-      inputProps={{ 'aria-label': 'Without label' }}
-    >
-      <MenuItem value="" onMouseUp={(e)=>{e.preventDefault()}}>
-        None
-      </MenuItem>
-      {fieldList.map((fieldDef:any, index:any) => (
-        <MenuItem key={index} value={fieldDef.identifier} onMouseUp={(e)=>{e.preventDefault()}}>
-          <span>{fieldDef.name}</span>
-        </MenuItem>
-      ))
-      }
-    </Select>
+  return <PropertyGroup header="Content settings" open={true}>    
+    <PropertyItem label="Field">
+      <Select
+          size="small"
+          fullWidth
+          value={property}
+          onChange={(e)=>{changeFontFormat(e.target.value,'fontFamily')}}
+          displayEmpty
+          inputProps={{ 'aria-label': 'Without label' }}
+        >
+          <MenuItem value="" onMouseUp={(e)=>{e.preventDefault()}}>
+            None
+          </MenuItem>
+          {fieldList.map((fieldDef:any, index:any) => (
+            <MenuItem key={index} value={fieldDef.identifier} onMouseUp={(e)=>{e.preventDefault()}}>
+              <span>{fieldDef.name}</span>
+            </MenuItem>
+          ))
+          }
+        </Select>
     </PropertyItem>
+    </PropertyGroup>
 
 }
 
