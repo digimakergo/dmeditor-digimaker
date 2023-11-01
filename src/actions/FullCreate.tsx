@@ -3,7 +3,7 @@ import {fetchWithAuth} from 'digimaker-ui/util';
 import {DMEditor} from 'dmeditor';
 import { Util } from "dmeditor/utils/Util";
 import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList, Tooltip } from '@mui/material';
-import { CloseOutlined, MenuOutlined, InfoOutlined, SendOutlined, SaveOutlined } from '@mui/icons-material';
+import { CloseOutlined, MenuOutlined, InfoOutlined, SendOutlined, SaveOutlined, CheckOutlined } from '@mui/icons-material';
 import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
@@ -22,7 +22,8 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const formRef = useRef(null);
   const dataRef:any = useRef(null);
-  const save = ()=>{
+  const save = (e:any)=>{
+    e.preventDefault();
     if(formRef.current){
       //form data
       let form=new FormData(formRef.current)
@@ -63,7 +64,8 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
     }
   }
 
-  const cancel = ()=>{
+  const cancel = (e:any)=>{
+    e.preventDefault();
     props.afterAction(2);
   }
   useEffect(()=>{
@@ -82,34 +84,18 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
     setData([...list]);
   }
   return <div>
-    <div className={dmeditorActionCss}>
-          <Button onClick={save} size='sm' variant='success'>
-            <SendOutlined /> Save
-        </Button></div>
-
     <DMEditor
-      menu={<div>          
-          <Button onClick={(e)=>setAnchorEl(e.currentTarget)} size='sm' variant='outlink-info'>
-            <MenuOutlined />
-          </Button>          
-          <Menu
-            id="basic-menu"
-            anchorEl={anchorEl}
-            open={anchorEl?true:false}
-            onClose={()=>setAnchorEl(null)}
-            MenuListProps={{
-              'aria-labelledby': 'basic-button',
-            }}
-          >
-            <MenuItem onClick={cancel}>
-              <ListItemIcon><CloseOutlined fontSize="small" /></ListItemIcon>
-              <ListItemText> Exit</ListItemText>
-            </MenuItem>
-            <MenuItem>          
-              <ListItemIcon><InfoOutlined fontSize="small" /></ListItemIcon>
-              <ListItemText>About</ListItemText>
-            </MenuItem>        
-          </Menu>
+      menu={<div>   
+        <Tooltip title="Save" placement="right" arrow>
+         <a href="/" className='current' onClick={save}>
+            <CheckOutlined />
+        </a>   
+        </Tooltip>     
+        <Tooltip title="Close" placement="right" arrow>
+        <a href="/" style={{color:'red'}} onClick={cancel}>
+          <CloseOutlined />
+        </a>   
+        </Tooltip>     
       </div>}
       data={data} 
       onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}

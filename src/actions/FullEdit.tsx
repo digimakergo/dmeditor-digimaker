@@ -3,7 +3,7 @@ import {fetchWithAuth} from 'digimaker-ui/util';
 import {DMEditor} from 'dmeditor';
 import { Util } from "dmeditor/utils/Util";
 import { ListItemIcon, ListItemText, Menu, MenuItem, MenuList, Tooltip } from '@mui/material';
-import { CloseOutlined, MenuOutlined, InfoOutlined, SendOutlined, SaveOutlined } from '@mui/icons-material';
+import { CloseOutlined, MenuOutlined, InfoOutlined, SendOutlined, SaveOutlined, CheckOutlined } from '@mui/icons-material';
 import { Button } from 'react-bootstrap';
 import { BrowseImage } from '../BrowseImage';
 import { css } from '@emotion/css'
@@ -11,13 +11,6 @@ import { BrowseLink } from '../BrowseLink';
 import { DMFieldSelect,PreBlock, SettingTab, convertDMFieldToInput } from './Common';
 import {getFileUrl,getImageUrl} from '../Config'
 // import toast from 'react-hot-toast';
-
-export const dmeditorActionCss = css`
-position: absolute;
-right: 0px;
-padding: 5px;
-z-index: 100;
-`;
 
 export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
   const [content, setContent] = useState<any>(null);
@@ -31,7 +24,8 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
   const [anchorEl, setAnchorEl] = React.useState<null | HTMLElement>(null);
   const formRef = useRef(null);
   const dataRef:any = useRef(null);
-  const save = ()=>{
+  const save = (e:any)=>{
+    e.preventDefault();
     let params:any={}
     let bodyJson:any={};
     bodyJson[editField]=JSON.stringify(data);
@@ -73,7 +67,8 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
       });
   }
 
-  const cancel = ()=>{
+  const cancel = (e:any)=>{
+    e.preventDefault();
     props.afterAction(2);
   }
 
@@ -114,40 +109,18 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
   }
   return <div>
       <div>
-      <div className={dmeditorActionCss}>
-      <Button onClick={save} size='sm' variant='success'>
-            <SendOutlined /> Save
-        </Button></div>
       <DMEditor
-      menu={<div><Button onClick={(e)=>setAnchorEl(e.currentTarget)} size='sm' variant='outlink-info'>
-          <MenuOutlined />
-        </Button>
-        <Menu
-          id="basic-menu"
-          anchorEl={anchorEl}
-          open={anchorEl?true:false}
-          onClose={()=>setAnchorEl(null)}
-          MenuListProps={{
-            'aria-labelledby': 'basic-button',
-          }}
-        >
-        <MenuItem onClick={cancel}><ListItemIcon>
-            <CloseOutlined fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-          Exit
-          </ListItemText>
-        </MenuItem>
-        <MenuItem>          
-          <ListItemIcon>
-            <InfoOutlined fontSize="small" />
-          </ListItemIcon>
-          <ListItemText>
-          About
-          </ListItemText>
-        </MenuItem>        
-        </Menu>
-
+      menu={<div>       
+        <Tooltip title="Save" placement="right" arrow>
+         <a href="/" className='current' onClick={save}>
+          <CheckOutlined />
+        </a>   
+        </Tooltip>     
+        <Tooltip title="Close" placement="right" arrow>
+        <a href="/" style={{color:'red'}} onClick={cancel}>
+          <CloseOutlined />
+        </a>   
+        </Tooltip>
         </div>}
 
       data={data} 
