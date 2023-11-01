@@ -10,6 +10,7 @@ import { css } from '@emotion/css'
 import { BrowseLink } from '../BrowseLink';
 import { DMFieldSelect,PreBlock, SettingTab, convertDMFieldToInput } from './Common';
 import {getFileUrl,getImageUrl} from '../Config'
+import i18n from 'dmeditor/i18n';
 // import toast from 'react-hot-toast';
 
 export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
@@ -111,12 +112,12 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
       <div>
       <DMEditor
       menu={<div>       
-        <Tooltip title="Save" placement="right" arrow>
+        <Tooltip title={i18n.t("Save")} placement="right" arrow>
          <a href="/" className='current' onClick={save}>
           <CheckOutlined />
         </a>   
         </Tooltip>     
-        <Tooltip title="Close" placement="right" arrow>
+        <Tooltip title={i18n.t("Close")} placement="right" arrow>
         <a href="/" style={{color:'red'}} onClick={cancel}>
           <CloseOutlined />
         </a>   

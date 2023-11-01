@@ -9,7 +9,7 @@ import { BrowseImage } from '../BrowseImage';
 import { BrowseLink } from '../BrowseLink';
 import { DMFieldSelect,PreBlock, SettingTab, convertDMFieldToInput } from './Common';
 import {getFileUrl,getImageUrl} from '../Config'
-import { dmeditorActionCss } from './FullEdit';
+import i18n from 'dmeditor/i18n';
 // import toast from 'react-hot-toast';
 
 export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string,data?:any})=>{
@@ -85,13 +85,14 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
   }
   return <div>
     <DMEditor
+      lang='nor-NO'
       menu={<div>   
-        <Tooltip title="Save" placement="right" arrow>
+        <Tooltip title={i18n.t("Save")} placement="right" arrow>
          <a href="/" className='current' onClick={save}>
             <CheckOutlined />
         </a>   
         </Tooltip>     
-        <Tooltip title="Close" placement="right" arrow>
+        <Tooltip title={i18n.t("Close")} placement="right" arrow>
         <a href="/" style={{color:'red'}} onClick={cancel}>
           <CloseOutlined />
         </a>   
