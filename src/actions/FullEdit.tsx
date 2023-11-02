@@ -13,7 +13,7 @@ import {getFileUrl,getImageUrl} from '../Config'
 import i18n from 'dmeditor/i18n';
 // import toast from 'react-hot-toast';
 
-export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
+export const FullEdit = (props:{id:number, lang?:string, afterAction:any,editField:any})=>{
   const [content, setContent] = useState<any>(null);
   const [data, setData] = useState(false as any);
   const [activeIndex, setActiveIndex] = useState(-1);
@@ -123,7 +123,7 @@ export const FullEdit = (props:{id:number, afterAction:any,editField:any})=>{
         </a>   
         </Tooltip>
         </div>}
-
+      lang={props.lang}
       data={data} 
       onChangeActive={(activeIndex:any)=>setActiveIndex(activeIndex)}
       onChange={(data)=>{setData([...data])}}

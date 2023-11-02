@@ -12,7 +12,7 @@ import {getFileUrl,getImageUrl} from '../Config'
 import i18n from 'dmeditor/i18n';
 // import toast from 'react-hot-toast';
 
-export const FullCreate = (props:{id:number, afterAction:any,contentType:string,editField:string,data?:any})=>{
+export const FullCreate = (props:{id:number, lang?:string, afterAction:any,contentType:string,editField:string,data?:any})=>{
   const [data, setData] = useState(props.data?props.data:[] as any);
   const [activeIndex, setActiveIndex] = useState(-1);
   const [validation,setValidation] = useState();
@@ -85,7 +85,7 @@ export const FullCreate = (props:{id:number, afterAction:any,contentType:string,
   }
   return <div>
     <DMEditor
-      lang='nor-NO'
+      lang={props.lang}
       menu={<div>   
         <Tooltip title={i18n.t("Save")} placement="right" arrow>
          <a href="/" className='current' onClick={save}>
